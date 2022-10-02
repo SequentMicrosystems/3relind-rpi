@@ -1,3 +1,4 @@
+[![3relind-rpi](res/sequent.jpg)](https://sequentmicrosystems.com)
 # 3relind-rpi
 Drivers for 3-Relays card
 
