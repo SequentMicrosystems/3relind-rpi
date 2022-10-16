@@ -74,8 +74,11 @@ typedef struct
 	} ModbusSetingsType;
 	
 // RS-485 CLI structures
-	extern const CliCmdType CMD_RS485_READ;
-	extern const CliCmdType CMD_RS485_WRITE;
-	
-	int doBoardInit(int stack);
+extern const CliCmdType CMD_RS485_READ;
+extern const CliCmdType CMD_RS485_WRITE;
+
+int doBoardInit(int stack);
+int boardCheck(int hwAdd);
+int doBoardModbusInit(int stack);
+int boardModbusCheck(int hwAdd);
 #endif //RELAY3_H_

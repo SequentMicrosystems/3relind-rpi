@@ -115,5 +115,118 @@ int i2cMem8Write(int dev, int add, uint8_t* buff, int size)
 	return 0;
 }
 
+int modbusSetup(int boardAddress, modbus_t *ctx)
+{
+	ctx = NULL;
+	int dev = 0;
+	ModbusSetingsType settings;
+	u8 buff[5];
+	int byteSize = 8;
+	char parity;
+    uint32_t sec_to = 1;
+    uint32_t usec_to = 0;
+
+	dev = i2cSetup(boardAddress);
+
+	if (dev == -1)
+	{
+		return ERROR;
+	}
+
+	if (OK != i2cMem8Read(dev, I2C_MODBUS_SETINGS_ADD, buff, 5))
+	{
+		printf("Fail to read RS485 settings!\n");
+		return ERROR;
+	}
+
+	memcpy(&settings, buff, sizeof(ModbusSetingsType));
+
+	switch ((int)settings.mbParity)
+	{
+		case 0:
+			parity = 'N';
+			break;
+		case 1:
+			parity = 'E';
+			break;
+		case 2:
+			parity = 'O';
+			break;
+		default:
+			parity = 'N';
+			break;
+	}
+
+#ifdef DEBUG_MODBUS
+	printf("parity = %c\r\n", parity);
+#endif
+
+	ctx = modbus_new_rtu(UART_PORT, (int)settings.mbBaud, parity, byteSize, (int)settings.mbStopB);
+
+    if (ctx == NULL)
+    {
+        fprintf(stderr, "Unable to allocate libmodbus context\n");
+        return ERROR;
+    }
 
 
+#ifdef DEBUG_MODBUS
+	if (modbus_set_debug(ctx, TRUE) == ERROR)
+	{
+		return ERROR;
+	}
+#endif
+
+	if (modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL) == ERROR ||
+		modbus_set_slave(ctx, boardAddress + 1) == ERROR ||
+		modbus_get_response_timeout(ctx, &sec_to, &usec_to) == ERROR)
+	{
+		return ERROR;
+	}
+
+	modbus_enable_rpi(ctx, TRUE);
+
+	return OK;
+}
+
+int modbusRead(int relayRegisterAddress, modbus_t *ctx, uint8_t *relayReadState)
+{
+	int numberOfBits = 1;
+
+	if (modbus_connect(ctx) == ERROR)
+    {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return ERROR;
+    }
+
+	if (modbus_read_bits(ctx, relayRegisterAddress, numberOfBits, relayReadState) == ERROR)
+	{
+		return ERROR;
+	}
+
+    modbus_close(ctx);
+    modbus_free(ctx);
+
+	return OK;
+}
+
+int modbusWrite(int relayRegisterAddress, modbus_t *ctx, uint8_t relayWriteState)
+{
+	if (modbus_connect(ctx) == ERROR)
+    {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return ERROR;
+    }
+
+	if (modbus_write_bit(ctx, relayRegisterAddress, relayWriteState) == ERROR)
+	{
+		return ERROR;
+	}
+
+    modbus_close(ctx);
+    modbus_free(ctx);
+
+	return OK;
+}

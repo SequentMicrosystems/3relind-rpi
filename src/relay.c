@@ -17,6 +17,11 @@
 #include "comm.h"
 #include "thread.h"
 
+// testing modbus after first build
+#include "modbus.h"
+#include <errno.h>
+#include <unistd.h>
+
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
 #define VERSION_MINOR	(int)1
@@ -251,6 +256,11 @@ int doBoardInit(int stack)
 	return dev;
 }
 
+int doBoardModbusInit(int stack)
+{
+	return OK;
+}
+
 int boardCheck(int hwAdd)
 {
 	int dev = 0;
@@ -265,6 +275,11 @@ int boardCheck(int hwAdd)
 	{
 		return ERROR;
 	}
+	return OK;
+}
+
+int boardModbusCheck(int hwAdd)
+{
 	return OK;
 }
 
@@ -381,6 +396,170 @@ static int doRelayWrite(int argc, char *argv[])
 	}
 	return OK;
 }
+
+#if 0
+
+/*
+ * doRelayMWrite:
+ *	Write coresponding modbus rtu relay channel
+ **************************************************************************************
+ */
+static int doRelayMWrite(int argc, char *argv[])
+{
+	printf("test mwrite command!\r\n");
+    
+	modbus_t *ctx = NULL;
+    uint32_t sec_to = 1;
+    uint32_t usec_to = 0;
+	uint8_t dest = 0;
+
+    int i;
+    int rc;
+    int nb_points = 1;
+
+	// new modbus
+    ctx = modbus_new_rtu(UART_PORT, BAUD_RATE, PARITY, BYTESIZE, STOPBITS);
+    if (ctx == NULL)
+    {
+        fprintf(stderr, "Unable to allocate libmodbus context\n");
+        return -1;
+    }
+
+
+	// modbus init
+    modbus_set_debug(ctx, TRUE);
+    modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
+    modbus_set_slave(ctx, SERVER_ID);
+    modbus_get_response_timeout(ctx, &sec_to, &usec_to);
+    modbus_enable_rpi(ctx,TRUE);
+
+	// modbus connect
+    if (modbus_connect(ctx) == -1)
+    {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return -1;
+    }
+
+
+	// start the first test
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 1);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 1);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 1);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(3);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 0);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 0);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 0);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+
+    sleep(1);
+
+
+
+    modbus_set_slave(ctx, SERVER_ID + 4);
+
+
+    sleep(1);
+
+
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 1);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 1);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 1);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(3);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 0);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 0);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 0);
+    printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+	// close connection
+    modbus_close(ctx);
+    modbus_free(ctx);
+
+
+	return OK;
+}
+
+#endif
+
 
 /*
  * doRelayRead:
