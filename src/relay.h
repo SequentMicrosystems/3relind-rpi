@@ -2,6 +2,7 @@
 #define RELAY3_H_
 
 #include <stdint.h>
+#include "modbus.h"
 
 #define RETRY_TIMES	10
 enum
@@ -79,6 +80,6 @@ extern const CliCmdType CMD_RS485_WRITE;
 
 int doBoardInit(int stack);
 int boardCheck(int hwAdd);
-int doBoardModbusInit(int stack);
-int boardModbusCheck(int hwAdd);
+int doBoardModbusInit(int stack, modbus_t *ctx);
+int boardModbusCheck(int stack);
 #endif //RELAY3_H_

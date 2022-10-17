@@ -117,7 +117,6 @@ int i2cMem8Write(int dev, int add, uint8_t* buff, int size)
 
 int modbusSetup(int boardAddress, modbus_t *ctx)
 {
-	ctx = NULL;
 	int dev = 0;
 	ModbusSetingsType settings;
 	u8 buff[5];

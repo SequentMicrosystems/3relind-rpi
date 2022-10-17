@@ -17,8 +17,6 @@
 #include "comm.h"
 #include "thread.h"
 
-// testing modbus after first build
-#include "modbus.h"
 #include <errno.h>
 #include <unistd.h>
 
@@ -27,7 +25,7 @@
 #define VERSION_MINOR	(int)1
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
-#define CMD_ARRAY_SIZE	11
+#define CMD_ARRAY_SIZE	15
 
 int relayChSet(int dev, u8 channel, OutStateEnumType state);
 int relayChGet(int dev, u8 channel, OutStateEnumType* state);
@@ -87,6 +85,17 @@ const CliCmdType CMD_WRITE =
 	"\tUsage:       3relind <id> write <value>\n",
 	"\tExample:     3relind 0 write 2 On; Set Relay #2 on Board #0 On\n"};
 
+static int doRelayModbusWrite(int argc, char *argv[]);
+const CliCmdType CMD_MODBUS_WRITE =
+{
+	"mwrite",
+	2,
+	&doRelayModbusWrite,
+	"\tmwrite:      Set modbus relays On/Off\n",
+	"\tUsage:       3relind <id> mwrite <channel> <on/off>\n",
+	"\tUsage:       3relind <id> mwrite <value>\n",
+	"\tExample:     3relind 0 mwrite 2 On; Set Modbus Relay #2 on Board #0 On\n"};
+
 static int doRelayRead(int argc, char *argv[]);
 const CliCmdType CMD_READ =
 {
@@ -97,6 +106,17 @@ const CliCmdType CMD_READ =
 	"\tUsage:       3relind <id> read <channel>\n",
 	"\tUsage:       3relind <id> read\n",
 	"\tExample:     3relind 0 read 2; Read Status of Relay #2 on Board #0\n"};
+
+static int doRelayModbusRead(int argc, char *argv[]);
+const CliCmdType CMD_MODBUS_READ =
+{
+	"mread",
+	2,
+	&doRelayModbusRead,
+	"\tmread:       Read modbus relays status\n",
+	"\tUsage:       3relind <id> mread <channel>\n",
+	"\tUsage:       3relind <id> mread\n",
+	"\tExample:     3relind 0 mread 2; Read Status of Modbus Relay #2 on Board #0\n"};
 
 static int doTest(int argc, char* argv[]);
 const CliCmdType CMD_TEST =
@@ -117,8 +137,12 @@ char *usage = "Usage:	 3relind -h <command>\n"
 	"         3relind -list\n"
 	"         3relind <id> write <channel> <on/off>\n"
 	"         3relind <id> write <value>\n"
+	"         3relind <id> mwrite <channel> <on/off>\n"
+	"         3relind <id> mwrite <value>\n"
 	"         3relind <id> read <channel>\n"
 	"         3relind <id> read\n"
+	"         3relind <id> mread <channel>\n"
+	"         3relind <id> mread\n"
 	"         3relind <id> test\n"
 	"         3relind <id> rs485rd\n"
 	"         3relind <id> rs485wr\n"
@@ -256,8 +280,30 @@ int doBoardInit(int stack)
 	return dev;
 }
 
-int doBoardModbusInit(int stack)
+int doBoardModbusInit(int stack, modbus_t *ctx)
 {
+	ctx = NULL;
+	int relayRegisterAddress = 0;
+	uint8_t *relayReadState = 0;
+
+	if ( (stack < 0) || (stack > 7))
+	{
+		printf("Invalid stack level [0..7]!");
+		return ERROR;
+	}
+
+	if (modbusSetup(stack, ctx) == ERROR)
+	{
+		printf("Error at modbus setup!");
+		return ERROR;
+	}
+
+	if (modbusRead(relayRegisterAddress, ctx, relayReadState) == ERROR)
+	{
+		printf("3relind board id %d not detected\n", stack);
+		return ERROR;
+	}
+
 	return OK;
 }
 
@@ -278,8 +324,30 @@ int boardCheck(int hwAdd)
 	return OK;
 }
 
-int boardModbusCheck(int hwAdd)
+int boardModbusCheck(int stack)
 {
+	modbus_t *ctx = NULL;
+	int relayRegisterAddress = 0;
+	uint8_t *relayReadState = 0;
+
+	if ( (stack < 0) || (stack > 7))
+	{
+		printf("Invalid stack level [0..7]!");
+		return ERROR;
+	}
+
+	if (modbusSetup(stack, ctx) == ERROR)
+	{
+		printf("Error at modbus setup!");
+		return ERROR;
+	}
+
+	if (modbusRead(relayRegisterAddress, ctx, relayReadState) == ERROR)
+	{
+		printf("3relind board id %d not detected\n", stack);
+		return ERROR;
+	}
+
 	return OK;
 }
 
@@ -397,169 +465,17 @@ static int doRelayWrite(int argc, char *argv[])
 	return OK;
 }
 
-#if 0
-
 /*
- * doRelayMWrite:
+ * doRelayModbusWrite:
  *	Write coresponding modbus rtu relay channel
  **************************************************************************************
  */
-static int doRelayMWrite(int argc, char *argv[])
+static int doRelayModbusWrite(int argc, char *argv[])
 {
 	printf("test mwrite command!\r\n");
     
-	modbus_t *ctx = NULL;
-    uint32_t sec_to = 1;
-    uint32_t usec_to = 0;
-	uint8_t dest = 0;
-
-    int i;
-    int rc;
-    int nb_points = 1;
-
-	// new modbus
-    ctx = modbus_new_rtu(UART_PORT, BAUD_RATE, PARITY, BYTESIZE, STOPBITS);
-    if (ctx == NULL)
-    {
-        fprintf(stderr, "Unable to allocate libmodbus context\n");
-        return -1;
-    }
-
-
-	// modbus init
-    modbus_set_debug(ctx, TRUE);
-    modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
-    modbus_set_slave(ctx, SERVER_ID);
-    modbus_get_response_timeout(ctx, &sec_to, &usec_to);
-    modbus_enable_rpi(ctx,TRUE);
-
-	// modbus connect
-    if (modbus_connect(ctx) == -1)
-    {
-        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        modbus_free(ctx);
-        return -1;
-    }
-
-
-	// start the first test
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 1);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 1);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 1);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(3);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 0);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 0);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 0);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-
-    sleep(1);
-
-
-
-    modbus_set_slave(ctx, SERVER_ID + 4);
-
-
-    sleep(1);
-
-
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 1);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 1);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 1);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(3);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 0);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 0);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-    sleep(2);
-
-    rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 0);
-    printf("rc : %d\n", rc);
-
-    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
-    printf("read bits: %d\n", dest);
-
-	// close connection
-    modbus_close(ctx);
-    modbus_free(ctx);
-
-
 	return OK;
 }
-
-#endif
-
 
 /*
  * doRelayRead:
@@ -616,6 +532,18 @@ static int doRelayRead(int argc, char *argv[])
 		printf("Usage: %s read relay value\n", argv[0]);
 		return ARG_CNT_ERR;
 	}
+	return OK;
+}
+
+/*
+ * doRelayModbusRead:
+ *	Read modbus rtu relay state
+ **************************************************************************************
+ */
+static int doRelayModbusRead(int argc, char *argv[])
+{
+	printf("test mread command!\r\n");
+
 	return OK;
 }
 
@@ -854,7 +782,11 @@ static void cliInit(void)
 	i++;
 	memcpy(&gCmdArray[i], &CMD_WRITE, sizeof(CliCmdType));
 	i++;
+	memcpy(&gCmdArray[i], &CMD_MODBUS_WRITE, sizeof(CliCmdType));
+	i++;
 	memcpy(&gCmdArray[i], &CMD_READ, sizeof(CliCmdType));
+	i++;
+	memcpy(&gCmdArray[i], &CMD_MODBUS_READ, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_TEST, sizeof(CliCmdType));
 	i++;
