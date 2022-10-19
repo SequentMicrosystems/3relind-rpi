@@ -115,8 +115,9 @@ int i2cMem8Write(int dev, int add, uint8_t* buff, int size)
 	return 0;
 }
 
-int modbusSetup(int boardAddress, modbus_t *ctx)
+modbus_t *modbusSetup(int boardAddress)
 {
+	modbus_t *ctx = NULL;
 	int dev = 0;
 	ModbusSetingsType settings;
 	u8 buff[5];
@@ -124,18 +125,32 @@ int modbusSetup(int boardAddress, modbus_t *ctx)
 	char parity;
     uint32_t sec_to = 1;
     uint32_t usec_to = 0;
+	int i = 0, i2c_stack = 0;
 
-	dev = i2cSetup(boardAddress);
+	for (i = 0; i < 8; i++)
+	{
+		if (boardCheck(RELAY3_HW_I2C_BASE_ADD + i) == OK)
+		{
+			i2c_stack = i;
+		}
+	}
+
+#ifdef DEBUG_MODBUS
+	printf("stack level i2c: %d\r\n", i2c_stack);
+#endif
+
+	i2c_stack = i2c_stack + RELAY3_HW_I2C_BASE_ADD;
+	dev = i2cSetup(i2c_stack);
 
 	if (dev == -1)
 	{
-		return ERROR;
+		return NULL;
 	}
 
 	if (OK != i2cMem8Read(dev, I2C_MODBUS_SETINGS_ADD, buff, 5))
 	{
 		printf("Fail to read RS485 settings!\n");
-		return ERROR;
+		return NULL;
 	}
 
 	memcpy(&settings, buff, sizeof(ModbusSetingsType));
@@ -165,14 +180,14 @@ int modbusSetup(int boardAddress, modbus_t *ctx)
     if (ctx == NULL)
     {
         fprintf(stderr, "Unable to allocate libmodbus context\n");
-        return ERROR;
+        return NULL;
     }
 
 
 #ifdef DEBUG_MODBUS
 	if (modbus_set_debug(ctx, TRUE) == ERROR)
 	{
-		return ERROR;
+		return NULL;
 	}
 #endif
 
@@ -180,22 +195,28 @@ int modbusSetup(int boardAddress, modbus_t *ctx)
 		modbus_set_slave(ctx, boardAddress + 1) == ERROR ||
 		modbus_get_response_timeout(ctx, &sec_to, &usec_to) == ERROR)
 	{
-		return ERROR;
+		printf("Fail to set slave ID!\n");
+		return NULL;
 	}
 
 	modbus_enable_rpi(ctx, TRUE);
 
-	return OK;
+	return ctx;
 }
 
-int modbusRead(int relayRegisterAddress, modbus_t *ctx, uint8_t *relayReadState)
+int modbusRead(modbus_t *ctx, int relayRegisterAddress, uint8_t *relayReadState)
 {
 	int numberOfBits = 1;
+
+	if (ctx == NULL)
+	{
+		printf("Modbus context NULL!\r\n");
+		return ERROR;
+	}
 
 	if (modbus_connect(ctx) == ERROR)
     {
         fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        modbus_free(ctx);
         return ERROR;
     }
 
@@ -204,18 +225,20 @@ int modbusRead(int relayRegisterAddress, modbus_t *ctx, uint8_t *relayReadState)
 		return ERROR;
 	}
 
-    modbus_close(ctx);
-    modbus_free(ctx);
-
 	return OK;
 }
 
-int modbusWrite(int relayRegisterAddress, modbus_t *ctx, uint8_t relayWriteState)
+int modbusWrite(modbus_t *ctx, int relayRegisterAddress, uint8_t relayWriteState)
 {
+	if (ctx == NULL)
+	{
+		printf("Modbus context NULL!\r\n");
+		return ERROR;
+	}
+
 	if (modbus_connect(ctx) == ERROR)
     {
         fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        modbus_free(ctx);
         return ERROR;
     }
 
@@ -223,9 +246,6 @@ int modbusWrite(int relayRegisterAddress, modbus_t *ctx, uint8_t relayWriteState
 	{
 		return ERROR;
 	}
-
-    modbus_close(ctx);
-    modbus_free(ctx);
 
 	return OK;
 }

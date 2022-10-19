@@ -26,9 +26,17 @@
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #define CMD_ARRAY_SIZE	15
+#define REGISTER_ADDRESS 0 //TODO: delete this
+#define SERVER_ID 1 //TODO: delete this
 
+int relaySet(int dev, int val);
+int relayGet(int dev, int* val);
 int relayChSet(int dev, u8 channel, OutStateEnumType state);
 int relayChGet(int dev, u8 channel, OutStateEnumType* state);
+int relayModbusSet(modbus_t *ctx, uint8_t state);
+int relayModbusGet(modbus_t *ctx, uint8_t *state);
+int relayChModbusSet(modbus_t *ctx, int channel, uint8_t state);
+int relayChModbusGet(modbus_t *ctx, int channel, uint8_t *state);
 
 static int doHelp(int argc, char *argv[]);
 const CliCmdType CMD_HELP =
@@ -198,6 +206,35 @@ int relayChSet(int dev, u8 channel, OutStateEnumType state)
 	return resp;
 }
 
+int relayChModbusSet(modbus_t *ctx, int channel, uint8_t state)
+{
+	if (ctx == NULL)
+	{
+		printf("Modbus context NULL!\r\n");
+		return ERROR;
+	}
+	
+	if ((channel < MODBUS_RELAY_CH_NR_MIN) || (channel > MODBUS_RELAY_CH_NR_MAX))
+	{
+		printf("Invalid relay nr!\n");
+		return ERROR;
+	}
+
+	if ((state != OFF) || (state != ON))
+	{
+		printf("Invalid relay state!\n");
+		return ERROR;
+	}
+
+	if (modbusWrite(ctx, channel, state) == ERROR)
+	{
+		printf("Error on writing state!\n");
+		return ERROR;
+	}
+
+	return OK;
+}
+
 int relayChGet(int dev, u8 channel, OutStateEnumType* state)
 {
 	u8 buff[2];
@@ -229,6 +266,34 @@ int relayChGet(int dev, u8 channel, OutStateEnumType* state)
 	return OK;
 }
 
+int relayChModbusGet(modbus_t *ctx, int channel, uint8_t *state)
+{
+	if (ctx == NULL)
+	{
+		printf("Modbus context NULL!\r\n");
+		return ERROR;
+	}
+
+	if ((channel < MODBUS_RELAY_CH_NR_MIN) || (channel > MODBUS_RELAY_CH_NR_MAX))
+	{
+		printf("Invalid relay nr!\n");
+		return ERROR;
+	}
+
+	if (state == NULL)
+	{
+		return ERROR;
+	}
+
+	if (modbusRead(ctx, channel, state) == ERROR)
+	{
+		printf("Error on reading state!\n");
+		return ERROR;
+	}
+
+	return OK;
+}
+
 int relaySet(int dev, int val)
 {
 	u8 buff[2];
@@ -236,6 +301,12 @@ int relaySet(int dev, int val)
 	buff[0] = 0xff & val;
 
 	return i2cMem8Write(dev, I2C_MEM_RELAY_VAL, buff, 1);
+}
+
+int relayModbusSet(modbus_t *ctx, uint8_t state)
+{
+	printf("relayModbusSet test\r\n");
+	return OK;
 }
 
 int relayGet(int dev, int* val)
@@ -251,6 +322,30 @@ int relayGet(int dev, int* val)
 		return ERROR;
 	}
 	*val = buff[0];
+	return OK;
+}
+
+int relayModbusGet(modbus_t *ctx, uint8_t *state)
+{
+	int relay_number = 0;
+	uint8_t state_0 = 0, state_1 = 0, state_2 = 0;
+
+	if (ctx == NULL)
+	{
+		printf("Modbus context NULL!\r\n");
+		return ERROR;
+	}
+
+	if (relayChModbusGet(ctx, relay_number, &state_0) != OK &&
+		relayChModbusGet(ctx, relay_number + 1, &state_1) != OK &&
+		relayChModbusGet(ctx, relay_number + 2, &state_2) != OK)
+	{
+		printf("Fail to read relays!\n");
+		return ERROR;
+	}
+
+	*state = state_0 + 2 * state_1 + 4 * state_2;
+
 	return OK;
 }
 
@@ -280,31 +375,34 @@ int doBoardInit(int stack)
 	return dev;
 }
 
-int doBoardModbusInit(int stack, modbus_t *ctx)
+modbus_t *doBoardModbusInit(int stack)
 {
-	ctx = NULL;
+	modbus_t *ctx = NULL;
 	int relayRegisterAddress = 0;
-	uint8_t *relayReadState = 0;
+	uint8_t relayReadState = 0;
 
 	if ( (stack < 0) || (stack > 7))
 	{
 		printf("Invalid stack level [0..7]!");
-		return ERROR;
+		return NULL;
 	}
 
-	if (modbusSetup(stack, ctx) == ERROR)
+	ctx = modbusSetup(stack);
+	if (ctx == NULL)
 	{
 		printf("Error at modbus setup!");
-		return ERROR;
+		return NULL;
 	}
 
-	if (modbusRead(relayRegisterAddress, ctx, relayReadState) == ERROR)
+	if (modbusRead(ctx, relayRegisterAddress, &relayReadState) == ERROR)
 	{
 		printf("3relind board id %d not detected\n", stack);
-		return ERROR;
+		modbus_close(ctx);
+		modbus_free(ctx);
+		return NULL;
 	}
 
-	return OK;
+	return ctx;
 }
 
 int boardCheck(int hwAdd)
@@ -328,7 +426,7 @@ int boardModbusCheck(int stack)
 {
 	modbus_t *ctx = NULL;
 	int relayRegisterAddress = 0;
-	uint8_t *relayReadState = 0;
+	uint8_t relayReadState = 0;
 
 	if ( (stack < 0) || (stack > 7))
 	{
@@ -336,15 +434,18 @@ int boardModbusCheck(int stack)
 		return ERROR;
 	}
 
-	if (modbusSetup(stack, ctx) == ERROR)
+	ctx = modbusSetup(stack);
+	if (ctx == NULL)
 	{
 		printf("Error at modbus setup!");
 		return ERROR;
 	}
 
-	if (modbusRead(relayRegisterAddress, ctx, relayReadState) == ERROR)
+	if (modbusRead(ctx, relayRegisterAddress, &relayReadState) == ERROR)
 	{
 		printf("3relind board id %d not detected\n", stack);
+		modbus_close(ctx);
+		modbus_free(ctx);
 		return ERROR;
 	}
 
@@ -473,7 +574,153 @@ static int doRelayWrite(int argc, char *argv[])
 static int doRelayModbusWrite(int argc, char *argv[])
 {
 	printf("test mwrite command!\r\n");
-    
+    // TODO: delete this and implement mwrite
+	modbus_t *ctx = NULL;
+    uint32_t sec_to = 1;
+    uint32_t usec_to = 0;
+	uint8_t dest = 0;
+
+    int i;
+    int rc;
+    int nb_points = 1;
+
+	// new modbus
+    ctx = modbus_new_rtu(UART_PORT, 38400, 'N', 8, 1);
+    if (ctx == NULL)
+    {
+        fprintf(stderr, "Unable to allocate libmodbus context\n");
+        return -1;
+    }
+
+
+	// modbus init
+    //modbus_set_debug(ctx, TRUE);
+    modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL);
+    modbus_set_slave(ctx, SERVER_ID);
+    modbus_get_response_timeout(ctx, &sec_to, &usec_to);
+    modbus_enable_rpi(ctx,TRUE);
+
+	// modbus connect
+    if (modbus_connect(ctx) == -1)
+    {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        modbus_free(ctx);
+        return -1;
+    }
+
+
+	// start the first test
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 1);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 1);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 1);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(3);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 0);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 0);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 0);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+
+    sleep(1);
+
+
+
+    modbus_set_slave(ctx, SERVER_ID + 4);
+
+
+    sleep(1);
+
+
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 1);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 1);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 1);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(3);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS, 0);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 1, 0);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 1, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+    sleep(2);
+
+    //rc = modbus_write_bit(ctx, REGISTER_ADDRESS + 2, 0);
+    //printf("rc : %d\n", rc);
+
+    rc = modbus_read_bits(ctx, REGISTER_ADDRESS + 2, 1, &dest);
+    printf("read bits: %d\n", dest);
+
+	// close connection
+    modbus_close(ctx);
+    modbus_free(ctx);
+
 	return OK;
 }
 
@@ -542,7 +789,70 @@ static int doRelayRead(int argc, char *argv[])
  */
 static int doRelayModbusRead(int argc, char *argv[])
 {
-	printf("test mread command!\r\n");
+	modbus_t *ctx = NULL;
+	int stack = atoi(argv[1]);
+	int relay_number = 0;
+	uint8_t relay_state = 0;
+	
+	ctx = doBoardModbusInit(stack);
+
+	if (ctx == NULL)
+	{
+		return COMM_ERR;
+	}
+
+	if (argc == 4)
+	{
+		relay_number = atoi(argv[3]);
+
+		if ((relay_number < MODBUS_RELAY_CH_NR_MIN + 1) || (relay_number > MODBUS_RELAY_CH_NR_MAX + 1))
+		{
+			printf("Relay number value out of range!\n");
+			modbus_close(ctx);
+			modbus_free(ctx);
+			return ARG_CNT_ERR;
+		}
+
+		relay_number = relay_number - 1;
+
+		if (relayChModbusGet(ctx, relay_number, &relay_state) != OK)
+		{
+			printf("Fail to read!\n");
+			modbus_close(ctx);
+			modbus_free(ctx);
+			return COMM_ERR;
+		}
+
+		if (relay_state != 0)
+		{
+			printf("1\n");
+		}
+		else
+		{
+			printf("0\n");
+		}
+	}
+	else if (argc == 3)
+	{
+		if (relayModbusGet(ctx, &relay_state) != OK)
+		{
+			printf("Fail to read!\n");
+			modbus_close(ctx);
+			modbus_free(ctx);
+			return COMM_ERR;
+		}
+		printf("%d\n", relay_state);
+	}
+	else
+	{
+		printf("Usage: %s read relay value\n", argv[0]);
+		modbus_close(ctx);
+		modbus_free(ctx);
+		return ARG_CNT_ERR;
+	}
+
+	modbus_close(ctx);
+	modbus_free(ctx);
 
 	return OK;
 }

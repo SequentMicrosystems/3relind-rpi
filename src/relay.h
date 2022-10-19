@@ -30,6 +30,8 @@ enum
 
 #define CHANNEL_NR_MIN		1
 #define RELAY_CH_NR_MAX		3
+#define MODBUS_RELAY_CH_NR_MIN		0
+#define MODBUS_RELAY_CH_NR_MAX		2
 
 #define ERROR	-1
 #define OK		0
@@ -80,6 +82,6 @@ extern const CliCmdType CMD_RS485_WRITE;
 
 int doBoardInit(int stack);
 int boardCheck(int hwAdd);
-int doBoardModbusInit(int stack, modbus_t *ctx);
+modbus_t *doBoardModbusInit(int stack);
 int boardModbusCheck(int stack);
 #endif //RELAY3_H_
