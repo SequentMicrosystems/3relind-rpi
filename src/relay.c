@@ -305,20 +305,44 @@ int relaySet(int dev, int val)
 
 int relayModbusSet(modbus_t *ctx, uint8_t state)
 {
-	printf("relayModbusSet test\r\n");
-	int a[10],n,i;
-	printf("Enter the number to convert: ");
-	scanf("%d",&n);
-	for(i=0;n>0;i++)
+	int a[8], i = 0, channel = 0;
+
+	if (ctx == NULL)
 	{
-		a[i]=n%2;
-		n=n/2;
+		printf("Modbus context NULL!\r\n");
+		return ERROR;
 	}
-	printf("\nBinary of Given Number is=");
-	for(i=i-1;i>=0;i--)
+
+	if (state == 0)
 	{
-		printf("%d",a[i]);
+		for (i = 0; i < RELAY_CH_NR_MAX; i++)
+		{
+			if (modbusWrite(ctx, channel + i, OFF) == ERROR)
+			{
+				printf("Error on writing state!\n");
+				return ERROR;
+			}
+		}
 	}
+	else
+	{
+		/* Convert state to binary */
+		for(i = 0; state > 0; i++)
+		{
+			a[i] = state%2;
+			state = state/2;
+		}
+
+		for (i = 0; i < RELAY_CH_NR_MAX; i++)
+		{
+			if (modbusWrite(ctx, channel + i, a[i]) == ERROR)
+			{
+				printf("Error on writing state!\n");
+				return ERROR;
+			}
+		}
+	}
+
 	return OK;
 }
 
@@ -357,6 +381,7 @@ int relayModbusGet(modbus_t *ctx, uint8_t *state)
 		return ERROR;
 	}
 
+	/* Convert state to decimal */
 	*state = state_0 + (2*state_1) + (4*state_2);
 
 	return OK;
@@ -590,7 +615,6 @@ static int doRelayModbusWrite(int argc, char *argv[])
 	int stack = atoi(argv[1]);
 	int relay_number = 0;
 	int relay_value = 0;
-	uint8_t relay_valR = 0;
 	OutStateEnumType relay_stateR = STATE_COUNT;
 	OutStateEnumType relay_state = STATE_COUNT;
 	int retry = 0;
@@ -636,6 +660,8 @@ static int doRelayModbusWrite(int argc, char *argv[])
 			if ((atoi(argv[4]) >= STATE_COUNT) || (atoi(argv[4]) < OFF))
 			{
 				printf("Invalid relay state!\n");
+				modbus_close(ctx);
+				modbus_free(ctx);
 				return ARG_CNT_ERR;
 			}
 			relay_state = atoi(argv[4]);
@@ -648,11 +674,15 @@ static int doRelayModbusWrite(int argc, char *argv[])
 			if (relayChModbusSet(ctx, relay_number, (uint8_t)relay_state) != OK)
 			{
 				printf("Fail to write relay\n");
+				modbus_close(ctx);
+				modbus_free(ctx);
 				return COMM_ERR;
 			}
 			if (relayChModbusGet(ctx, relay_number, (uint8_t *)&relay_stateR) != OK)
 			{
 				printf("Fail to read relay\n");
+				modbus_close(ctx);
+				modbus_free(ctx);
 				return COMM_ERR;
 			}
 			retry--;
@@ -666,6 +696,8 @@ static int doRelayModbusWrite(int argc, char *argv[])
 		if (retry == 0)
 		{
 			printf("Fail to write relay\n");
+			modbus_close(ctx);
+			modbus_free(ctx);
 			return COMM_ERR;
 		}
 	}
@@ -675,37 +707,22 @@ static int doRelayModbusWrite(int argc, char *argv[])
 		if (relay_value < 0 || relay_value > 255)
 		{
 			printf("Invalid relay value\n");
+			modbus_close(ctx);
+			modbus_free(ctx);
 			return ARG_CNT_ERR;
 		}
 
-		retry = RETRY_TIMES;
-		relay_valR = -1;
-
-		while ((retry > 0) && (relay_valR != relay_value))
-		{
-			if (relayModbusSet(ctx, relay_value) != OK)
-			{
-				printf("Fail to write relay!\n");
-				return COMM_ERR;
-			}
-			if (relayModbusGet(ctx, &relay_valR) != OK)
-			{
-				printf("Fail to read relay!\n");
-				return COMM_ERR;
-			}
-		}
-#ifdef DEBUG_MODBUS
-		if(retry < RETRY_TIMES)
-		{
-			printf("retry %d times\n", 3-retry);
-		}
-#endif
-		if (retry == 0)
+		if (relayModbusSet(ctx, relay_value) != OK)
 		{
 			printf("Fail to write relay!\n");
+			modbus_close(ctx);
+			modbus_free(ctx);
 			return COMM_ERR;
 		}
 	}
+
+	modbus_close(ctx);
+	modbus_free(ctx);
 
 	return OK;
 }
