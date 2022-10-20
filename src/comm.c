@@ -201,6 +201,12 @@ modbus_t *modbusSetup(int boardAddress)
 
 	modbus_enable_rpi(ctx, TRUE);
 
+	if (modbus_connect(ctx) == ERROR)
+    {
+        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+        return ERROR;
+    }
+
 	return ctx;
 }
 
@@ -213,12 +219,6 @@ int modbusRead(modbus_t *ctx, int relayRegisterAddress, uint8_t *relayReadState)
 		printf("Modbus context NULL!\r\n");
 		return ERROR;
 	}
-
-	if (modbus_connect(ctx) == ERROR)
-    {
-        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        return ERROR;
-    }
 
 	if (modbus_read_bits(ctx, relayRegisterAddress, numberOfBits, relayReadState) == ERROR)
 	{
@@ -235,12 +235,6 @@ int modbusWrite(modbus_t *ctx, int relayRegisterAddress, uint8_t relayWriteState
 		printf("Modbus context NULL!\r\n");
 		return ERROR;
 	}
-
-	if (modbus_connect(ctx) == ERROR)
-    {
-        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        return ERROR;
-    }
 
 	if (modbus_write_bit(ctx, relayRegisterAddress, relayWriteState) == ERROR)
 	{
