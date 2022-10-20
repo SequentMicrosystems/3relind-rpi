@@ -123,8 +123,8 @@ modbus_t *modbusSetup(int boardAddress)
 	u8 buff[5];
 	int byteSize = 8;
 	char parity;
-    uint32_t sec_to = 1;
-    uint32_t usec_to = 0;
+	uint32_t sec_to = 1;
+	uint32_t usec_to = 0;
 	int i = 0, i2c_stack = 0;
 
 	for (i = 0; i < 8; i++)
@@ -177,11 +177,11 @@ modbus_t *modbusSetup(int boardAddress)
 
 	ctx = modbus_new_rtu(UART_PORT, (int)settings.mbBaud, parity, byteSize, (int)settings.mbStopB);
 
-    if (ctx == NULL)
-    {
-        fprintf(stderr, "Unable to allocate libmodbus context\n");
-        return NULL;
-    }
+	if (ctx == NULL)
+	{
+		fprintf(stderr, "Unable to allocate libmodbus context\n");
+		return NULL;
+	}
 
 
 #ifdef DEBUG_MODBUS
@@ -196,16 +196,18 @@ modbus_t *modbusSetup(int boardAddress)
 		modbus_get_response_timeout(ctx, &sec_to, &usec_to) == ERROR)
 	{
 		printf("Fail to set slave ID!\n");
+		modbus_free(ctx);
 		return NULL;
 	}
 
 	modbus_enable_rpi(ctx, TRUE);
 
 	if (modbus_connect(ctx) == ERROR)
-    {
-        fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
-        return ERROR;
-    }
+	{
+		fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
+		modbus_free(ctx);
+		return NULL;
+	}
 
 	return ctx;
 }
