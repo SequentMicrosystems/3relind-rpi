@@ -148,6 +148,17 @@ const CliCmdType CMD_TEST =
 	"\tUsage:       3relind <id> test\n",
 	"\tExample:     3relind 0 test\n"};
 
+static int doModbusTest(int argc, char* argv[]);
+const CliCmdType CMD_MODBUS_TEST =
+{
+	"mtest",
+	2,
+	&doModbusTest,
+	"\tmtest:       Turn ON and OFF the modbus relays until press a key\n",
+	"",
+	"\tUsage:       3relind <id> mtest\n",
+	"\tExample:     3relind 0 mtest\n"};
+
 CliCmdType gCmdArray[CMD_ARRAY_SIZE];
 
 char *usage = "Usage:	 3relind -h <command>\n"
@@ -164,6 +175,7 @@ char *usage = "Usage:	 3relind -h <command>\n"
 	"         3relind <id> mread <channel>\n"
 	"         3relind <id> mread\n"
 	"         3relind <id> test\n"
+	"         3relind <id> mtest\n"
 	"         3relind <id> rs485rd\n"
 	"         3relind <id> rs485wr\n"
 	"Where: <id> = Board level id = 0..7\n"
@@ -1124,6 +1136,147 @@ static int doTest(int argc, char* argv[])
 	return OK;
 }
 
+static int doModbusTest(int argc, char* argv[])
+{
+	modbus_t *ctx = NULL;
+	int i = 0;
+	int retry = 0;
+	int relVal;
+	uint8_t valR;
+	int relayResult = 0;
+	FILE* file = NULL;
+	const u8 relayOrder[8] =
+	{
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8};
+
+	ctx = doBoardModbusInit(atoi(argv[1]));
+	if (ctx == NULL)
+	{
+		exit(1);
+	}
+
+	if (argc == 4)
+	{
+		file = fopen(argv[3], "w");
+		if (!file)
+		{
+			printf("Fail to open result file\n");
+			//return -1;
+		}
+	}
+//relay test****************************
+	if (strcasecmp(argv[2], "mtest") == 0)
+	{
+		relVal = 0;
+		printf(
+			"Are all relays and LEDs turning on and off in sequence?\nPress y for Yes or any key for No....");
+		startThread();
+		while (relayResult == 0)
+		{
+			for (i = 0; i < 3; i++)
+			{
+				relayResult = checkThreadResult();
+				if (relayResult != 0)
+				{
+					break;
+				}
+				valR = 0;
+				relVal = (u8)1 << (relayOrder[i] - 1);
+
+				retry = RETRY_TIMES;
+				while ( (retry > 0) && ( (valR & relVal) == 0))
+				{
+					if (relayChModbusSet(ctx, relayOrder[i] - 1, ON) != OK)
+					{
+						retry = 0;
+						break;
+					}
+
+					if (relayModbusGet(ctx, &valR) != OK)
+					{
+						retry = 0;
+					}
+				}
+				if (retry == 0)
+				{
+					printf("Fail to write relay\n");
+					if (file)
+						fclose(file);
+					return COMM_ERR;
+				}
+				busyWait(150);
+			}
+
+			for (i = 0; i < 3; i++)
+			{
+				relayResult = checkThreadResult();
+				if (relayResult != 0)
+				{
+					break;
+				}
+				valR = 0xff;
+				relVal = (u8)1 << (relayOrder[i] - 1);
+				retry = RETRY_TIMES;
+				while ( (retry > 0) && ( (valR & relVal) != 0))
+				{
+					if (relayChModbusSet(ctx, relayOrder[i] - 1, OFF) != OK)
+					{
+						retry = 0;
+					}
+					if (relayModbusGet(ctx, &valR) != OK)
+					{
+						retry = 0;
+					}
+				}
+				if (retry == 0)
+				{
+					printf("Fail to write relay!\n");
+					if (file)
+						fclose(file);
+					return COMM_ERR;
+				}
+				busyWait(150);
+			}
+		}
+	}
+	if (relayResult == YES)
+	{
+		if (file)
+		{
+			fprintf(file, "Relay Test ............................ PASS\n");
+		}
+		else
+		{
+			printf("Relay Test ............................ PASS\n");
+		}
+	}
+	else
+	{
+		if (file)
+		{
+			fprintf(file, "Relay Test ............................ FAIL!\n");
+		}
+		else
+		{
+			printf("Relay Test ............................ FAIL!\n");
+		}
+	}
+	if (file)
+	{
+		fclose(file);
+	}
+
+	relayModbusSet(ctx, OFF);
+	return OK;
+}
+
 static int doWarranty(int argc UNU, char* argv[] UNU)
 {
 	printf("%s\n", warranty);
@@ -1153,6 +1306,8 @@ static void cliInit(void)
 	memcpy(&gCmdArray[i], &CMD_MODBUS_READ, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_TEST, sizeof(CliCmdType));
+	i++;
+	memcpy(&gCmdArray[i], &CMD_MODBUS_TEST, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_VERSION, sizeof(CliCmdType));
 	i++;
