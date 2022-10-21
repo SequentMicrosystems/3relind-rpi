@@ -31,6 +31,8 @@
 #include <linux/serial.h>
 #endif
 
+#define UNUSED(x) (void)x
+
 /* Table of CRC values for high-order byte */
 static const uint8_t table_crc_hi[] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0,
@@ -151,6 +153,7 @@ static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
 
 static int _modbus_rtu_prepare_response_tid(const uint8_t *req, int *req_length)
 {
+    UNUSED(req);
     (*req_length) -= _MODBUS_RTU_CHECKSUM_LENGTH;
     /* No TID */
     return 0;
@@ -392,6 +395,7 @@ static int _modbus_rtu_pre_check_confirmation(modbus_t *ctx, const uint8_t *req,
 {
     /* Check responding slave is the slave we requested (except for broacast
      * request) */
+    UNUSED(rsp_length);
     if (req[0] != rsp[0] && req[0] != MODBUS_BROADCAST_ADDRESS) {
         if (ctx->debug) {
             fprintf(stderr,
@@ -1208,6 +1212,7 @@ static int _modbus_rtu_select(modbus_t *ctx, fd_set *rset,
         return -1;
     }
 #else
+    UNUSED(length_to_read);
     while ((s_rc = select(ctx->s+1, rset, NULL, NULL, tv)) == -1) {
         if (errno == EINTR) {
             if (ctx->debug) {

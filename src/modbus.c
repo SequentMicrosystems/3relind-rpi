@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "../config.h"
+#include "modbus-config.h"
 
 #include "modbus.h"
 #include "modbus-private.h"

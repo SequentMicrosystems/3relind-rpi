@@ -6,12 +6,12 @@ Q ?= @
 endif
 
 CC	= gcc
-CFLAGS	= $(DEBUG) -Wall -Wextra $(INCLUDE) -Winline -pipe 
+CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe 
 
 LDFLAGS	= -L$(DESTDIR)$(PREFIX)/lib
 LIBS    = -lpthread -lrt -lm -lcrypt
 
-SRC	=	src/relay.c src/comm.c src/thread.c src/rs485.c src/modbus-data.c src/modbus-rtu.c src/modbus-tcp.c src/modbus.c
+SRC	=	src/relay.c src/comm.c src/thread.c src/rs485.c src/modbus-data.c src/modbus-rtu.c src/modbus.c
 
 OBJ	=	$(SRC:.c=.o)
 

@@ -25,9 +25,7 @@
 #define VERSION_MINOR	(int)1
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
-#define CMD_ARRAY_SIZE	15
-#define REGISTER_ADDRESS 0 //TODO: delete this
-#define SERVER_ID 1 //TODO: delete this
+#define CMD_ARRAY_SIZE	13
 
 int relaySet(int dev, int val);
 int relayGet(int dev, int* val);
@@ -88,7 +86,7 @@ const CliCmdType CMD_MODBUS_LIST =
 		"-mlist",
 		1,
 		&doModbusList,
-		"\t-mlist:      List all 3relind modbus boards connected,\n\t\t     return nr of modbus boards and stack level for every board\n",
+		"\t-mlist:      List all 3relind modbus boards connected,\n\treturn       nr of modbus boards and stack level for every board\n",
 		"\tUsage:       3relind -mlist\n",
 		"",
 		"\tExample:     3relind -mlist display: 1,0 \n"};
