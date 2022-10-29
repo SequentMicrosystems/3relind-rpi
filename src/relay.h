@@ -79,6 +79,8 @@ typedef struct
 // RS-485 CLI structures
 extern const CliCmdType CMD_RS485_READ;
 extern const CliCmdType CMD_RS485_WRITE;
+extern const CliCmdType CMD_RS485_MODBUS_READ;
+extern const CliCmdType CMD_RS485_MODBUS_WRITE;
 
 int doBoardInit(int stack);
 int boardCheck(int hwAdd);

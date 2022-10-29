@@ -25,7 +25,7 @@
 #define VERSION_MINOR	(int)1
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
-#define CMD_ARRAY_SIZE	13
+#define CMD_ARRAY_SIZE	15
 
 int relaySet(int dev, int val);
 int relayGet(int dev, int* val);
@@ -38,14 +38,14 @@ int relayChModbusGet(modbus_t *ctx, int channel, uint8_t *state);
 
 static int doHelp(int argc, char *argv[]);
 const CliCmdType CMD_HELP =
-	{
-		"-h",
-		1,
-		&doHelp,
-		"\t-h          Display the list of command options or one command option details\n",
-		"\tUsage:      3relind -h    Display command options list\n",
-		"\tUsage:      3relind -h <param>   Display help for <param> command option\n",
-		"\tExample:    3relind -h write    Display help for \"write\" command option\n"};
+{
+	"-h",
+	1,
+	&doHelp,
+	"\t-h           Display the list of command options or one command option details\n",
+	"\tUsage:       3relind -h    Display command options list\n",
+	"\tUsage:       3relind -h <param>   Display help for <param> command option\n",
+	"\tExample:     3relind -h write    Display help for \"write\" command option\n"};
 
 static int doVersion(int argc, char *argv[]);
 const CliCmdType CMD_VERSION =
@@ -53,10 +53,10 @@ const CliCmdType CMD_VERSION =
 	"-v",
 	1,
 	&doVersion,
-	"\t-v              Display the version number\n",
-	"\tUsage:          3relind -v\n",
+	"\t-v           Display the version number\n",
+	"\tUsage:       3relind -v\n",
 	"",
-	"\tExample:        3relind -v  Display the version number\n"};
+	"\tExample:     3relind -v  Display the version number\n"};
 
 static int doWarranty(int argc, char* argv[]);
 const CliCmdType CMD_WAR =
@@ -64,32 +64,32 @@ const CliCmdType CMD_WAR =
 	"-warranty",
 	1,
 	&doWarranty,
-	"\t-warranty       Display the warranty\n",
-	"\tUsage:          3relind -warranty\n",
+	"\t-warranty    Display the warranty\n",
+	"\tUsage:       3relind -warranty\n",
 	"",
-	"\tExample:        3relind -warranty  Display the warranty text\n"};
+	"\tExample:     3relind -warranty  Display the warranty text\n"};
 
 static int doList(int argc, char *argv[]);
 const CliCmdType CMD_LIST =
-	{
-		"-list",
-		1,
-		&doList,
-		"\t-list:       List all 3relind boards connected,\n\treturn       nr of boards and stack level for every board\n",
-		"\tUsage:       3relind -list\n",
-		"",
-		"\tExample:     3relind -list display: 1,0 \n"};
+{
+	"-list",
+	1,
+	&doList,
+	"\t-list:       List all 3relind boards connected,\n\treturn       nr of boards and stack level for every board\n",
+	"\tUsage:       3relind -list\n",
+	"",
+	"\tExample:     3relind -list display: 1,0 \n"};
 
 static int doModbusList(int argc, char *argv[]);
 const CliCmdType CMD_MODBUS_LIST =
-	{
-		"-mlist",
-		1,
-		&doModbusList,
-		"\t-mlist:      List all 3relind modbus boards connected,\n\treturn       nr of modbus boards and stack level for every board\n",
-		"\tUsage:       3relind -mlist\n",
-		"",
-		"\tExample:     3relind -mlist display: 1,0 \n"};
+{
+	"-mlist",
+	1,
+	&doModbusList,
+	"\t-mlist:      List all 3relind modbus boards connected,\n\treturn       nr of modbus boards and stack level for every board\n",
+	"\tUsage:       3relind -mlist\n",
+	"",
+	"\tExample:     3relind -mlist display: 1,0 \n"};
 
 static int doRelayWrite(int argc, char *argv[]);
 const CliCmdType CMD_WRITE =
@@ -174,8 +174,10 @@ char *usage = "Usage:	 3relind -h <command>\n"
 	"         3relind <id> mread\n"
 	"         3relind <id> test\n"
 	"         3relind <id> mtest\n"
-	"         3relind <id> rs485rd\n"
-	"         3relind <id> rs485wr\n"
+	"         3relind <id> cfg485rd\n"
+	"         3relind <id> cfg485wr\n"
+	"         3relind cfgmbrd\n"
+	"         3relind cfgmbwr\n"
 	"Where: <id> = Board level id = 0..7\n"
 	"Type 3relind -h <command> for more help"; // No trailing newline needed here.
 
@@ -417,7 +419,7 @@ int doBoardInit(int stack)
 
 	if ( (stack < 0) || (stack > 7))
 	{
-		printf("Invalid stack level [0..7]!");
+		printf("Invalid stack level [0..7]!\n");
 		return ERROR;
 	}
 	add = stack + RELAY3_HW_I2C_BASE_ADD;
@@ -443,14 +445,14 @@ modbus_t *doBoardModbusInit(int stack)
 
 	if ( (stack < 0) || (stack > 7))
 	{
-		printf("Invalid stack level [0..7]!");
+		printf("Invalid stack level [0..7]!\n");
 		return NULL;
 	}
 
 	ctx = modbusSetup(stack);
 	if (ctx == NULL)
 	{
-		printf("Error at modbus setup!");
+		printf("Error at modbus setup!\n");
 		return NULL;
 	}
 
@@ -490,14 +492,14 @@ int boardModbusCheck(int stack)
 
 	if ( (stack < 0) || (stack > 7))
 	{
-		printf("Invalid stack level [0..7]!");
+		printf("Invalid stack level [0..7]!\n");
 		return ERROR;
 	}
 
 	ctx = modbusSetup(stack);
 	if (ctx == NULL)
 	{
-		printf("Error at modbus setup!");
+		printf("Error at modbus setup!\n");
 		return ERROR;
 	}
 
@@ -1312,6 +1314,10 @@ static void cliInit(void)
 	memcpy(&gCmdArray[i], &CMD_RS485_READ, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_RS485_WRITE, sizeof(CliCmdType));
+	i++;
+	memcpy(&gCmdArray[i], &CMD_RS485_MODBUS_READ, sizeof(CliCmdType));
+	i++;
+	memcpy(&gCmdArray[i], &CMD_RS485_MODBUS_WRITE, sizeof(CliCmdType));
 	i++;
 
 }

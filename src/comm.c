@@ -50,7 +50,7 @@ int i2cSetup(int addr)
 
 	if ( (file = open(filename, O_RDWR)) < 0)
 	{
-		printf("Failed to open the bus.");
+		printf("Failed to open the bus.\n");
 		return -1;
 	}
 	if (ioctl(file, I2C_SLAVE, addr) < 0)
