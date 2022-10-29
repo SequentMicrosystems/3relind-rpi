@@ -25,7 +25,7 @@
 #define VERSION_MINOR	(int)1
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
-#define CMD_ARRAY_SIZE	15
+#define CMD_ARRAY_SIZE	14
 
 int relaySet(int dev, int val);
 int relayGet(int dev, int* val);
@@ -79,17 +79,6 @@ const CliCmdType CMD_LIST =
 	"\tUsage:       3relind -list\n",
 	"",
 	"\tExample:     3relind -list display: 1,0 \n"};
-
-static int doModbusList(int argc, char *argv[]);
-const CliCmdType CMD_MODBUS_LIST =
-{
-	"-mlist",
-	1,
-	&doModbusList,
-	"\t-mlist:      List all 3relind modbus boards connected,\n\treturn       nr of modbus boards and stack level for every board\n",
-	"\tUsage:       3relind -mlist\n",
-	"",
-	"\tExample:     3relind -mlist display: 1,0 \n"};
 
 static int doRelayWrite(int argc, char *argv[]);
 const CliCmdType CMD_WRITE =
@@ -163,7 +152,6 @@ char *usage = "Usage:	 3relind -h <command>\n"
 	"         3relind -v\n"
 	"         3relind -warranty\n"
 	"         3relind -list\n"
-	"         3relind -mlist\n"
 	"         3relind <id> write <channel> <on/off>\n"
 	"         3relind <id> write <value>\n"
 	"         3relind <id> mwrite <channel> <on/off>\n"
@@ -481,38 +469,6 @@ int boardCheck(int hwAdd)
 	{
 		return ERROR;
 	}
-	return OK;
-}
-
-int boardModbusCheck(int stack)
-{
-	modbus_t *ctx = NULL;
-	int relayRegisterAddress = 0;
-	uint8_t relayReadState = 0;
-
-	if ( (stack < 0) || (stack > 7))
-	{
-		printf("Invalid stack level [0..7]!\n");
-		return ERROR;
-	}
-
-	ctx = modbusSetup(stack);
-	if (ctx == NULL)
-	{
-		printf("Error at modbus setup!\n");
-		return ERROR;
-	}
-
-	if (modbusRead(ctx, relayRegisterAddress, &relayReadState) == ERROR)
-	{
-#ifdef DEBUG_MODBUS
-		printf("3relind board id %d not detected\n", stack);
-#endif
-		modbus_close(ctx);
-		modbus_free(ctx);
-		return ERROR;
-	}
-
 	return OK;
 }
 
@@ -959,41 +915,6 @@ static int doList(int argc, char *argv[])
 	return OK;
 }
 
-static int doModbusList(int argc, char *argv[])
-{
-	int board_ids[8];
-	int i = 0, cnt = 0;
-
-	UNUSED(argc);
-	UNUSED(argv);
-
-	printf("Detecting boards...\r\n");
-
-	for (i = 0; i < 8; i++)
-	{
-		if (boardModbusCheck(i) == OK)
-		{
-			board_ids[cnt] = i;
-			cnt++;
-		}
-	}
-
-	printf("%d board(s) detected\n", cnt);
-
-	if (cnt > 0)
-	{
-		printf("Id:");
-	}
-	while (cnt > 0)
-	{
-		cnt--;
-		printf(" %d", board_ids[cnt]);
-	}
-
-	printf("\n");
-	return OK;
-}
-
 /* 
  * Self test for production
  */
@@ -1295,8 +1216,6 @@ static void cliInit(void)
 	i++;
 	memcpy(&gCmdArray[i], &CMD_LIST, sizeof(CliCmdType));
 	i++;
-	memcpy(&gCmdArray[i], &CMD_MODBUS_LIST, sizeof(CliCmdType));
-	i++;
 	memcpy(&gCmdArray[i], &CMD_WRITE, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_MODBUS_WRITE, sizeof(CliCmdType));
@@ -1318,8 +1237,6 @@ static void cliInit(void)
 	memcpy(&gCmdArray[i], &CMD_RS485_MODBUS_READ, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_RS485_MODBUS_WRITE, sizeof(CliCmdType));
-	i++;
-
 }
 
 int main(int argc, char *argv[])
