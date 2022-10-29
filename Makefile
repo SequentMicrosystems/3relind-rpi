@@ -46,3 +46,4 @@ uninstall:
 	$Q echo "[UnInstall]"
 	$Q rm -f $(DESTDIR)$(PREFIX)/bin/3relind
 	$Q rm -f $(DESTDIR)$(PREFIX)/man/man1/3relind.1
+	$Q rm -f $(DESTDIR)$(PREFIX)/etc/modbus_rs485_settings.txt

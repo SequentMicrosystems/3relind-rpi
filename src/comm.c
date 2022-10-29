@@ -9,6 +9,7 @@
  ***********************************************************************
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -115,74 +116,157 @@ int i2cMem8Write(int dev, int add, uint8_t* buff, int size)
 	return 0;
 }
 
-modbus_t *modbusSetup(int boardAddress)
+rs485_settings_t modbusGetSettings(char modbusSettingsStr[], int index)
 {
-	modbus_t *ctx = NULL;
-	int dev = 0;
-	ModbusSetingsType settings;
-	u8 buff[5];
-	int byteSize = 8;
-	char parity;
-	uint32_t sec_to = 1;
-	uint32_t usec_to = 0;
-	int i = 0, i2c_stack = 0;
+	rs485_settings_t modbusRs485Settings;
+	int j = 0, k = 0;
+	char bufStr[255];
 
-	for (i = 0; i < 8; i++)
+	modbusRs485Settings.index = index;
+	memset(modbusRs485Settings.bufStr, 0, 255*sizeof(char));
+	memset(bufStr, 0, 255*sizeof(char));
+
+	while(modbusSettingsStr[modbusRs485Settings.index] != ',')
 	{
-		if (boardCheck(RELAY3_HW_I2C_BASE_ADD + i) == OK)
+		if (modbusSettingsStr[modbusRs485Settings.index] == '.')
+			break;
+		else
+			modbusRs485Settings.index++;
+	}
+
+	j = modbusRs485Settings.index;
+	while(modbusSettingsStr[j] != ' ')
+		j--;
+
+	j++;
+	while(modbusSettingsStr[j] != ',')
+	{
+		if (modbusSettingsStr[j] == '.')
+			break;
+		else
 		{
-			i2c_stack = i;
+			bufStr[k] = modbusSettingsStr[j];
+			j++;
+			k++;
 		}
 	}
 
+	memcpy(modbusRs485Settings.bufStr, bufStr, strlen(bufStr));
 #ifdef DEBUG_MODBUS
-	printf("stack level i2c: %d\r\n", i2c_stack);
+	printf("strlen(bufStr) = %d\r\n", strlen(bufStr));
+	printf("bufStr = %s\r\n", bufStr);
+	printf("modbusRs485Settings.bufStr = %s\r\n", modbusRs485Settings.bufStr);
 #endif
 
-	i2c_stack = i2c_stack + RELAY3_HW_I2C_BASE_ADD;
-	dev = i2cSetup(i2c_stack);
+	return modbusRs485Settings;
+}
 
-	if (dev == -1)
+modbus_t *modbusSetup(int boardAddress)
+{
+	modbus_t *ctx = NULL;
+	rs485_settings_t modbusRs485Settings;
+	char modbusSettingsStr[255];
+	int index = 0;
+	int modbusBaud = 0;
+	char modbusParity = '0';
+	int modbusByteSize = MODBUS_DEFAULT_BYTESIZE;
+	int modbusStopBits = 0;
+	uint32_t sec_to = 1;
+	uint32_t usec_to = 0;
+	FILE *fp = NULL;
+
+	modbusRs485Settings.index = 0;
+	memset(modbusRs485Settings.bufStr, 0, 255*sizeof(char));
+	memset(modbusSettingsStr, 0, 255*sizeof(char));
+
+	/* try to open modbus settings file */
+	fp = fopen("/usr/local/etc/modbus_rs485_settings.txt", "r");
+	if (fp == NULL)
 	{
-		return NULL;
-	}
-
-	if (OK != i2cMem8Read(dev, I2C_MODBUS_SETINGS_ADD, buff, 5))
-	{
-		printf("Fail to read RS485 settings!\n");
-		return NULL;
-	}
-
-	memcpy(&settings, buff, sizeof(ModbusSetingsType));
-
-	switch ((int)settings.mbParity)
-	{
-		case 0:
-			parity = 'N';
-			break;
-		case 1:
-			parity = 'E';
-			break;
-		case 2:
-			parity = 'O';
-			break;
-		default:
-			parity = 'N';
-			break;
-	}
+		/* use default settings */
+#ifdef DEBUG_MODBUS
+		printf("'modbus_rs485_settings.txt' does not exist. Using default settings...\r\n");
+#endif
+		modbusBaud = MODBUS_DEFAULT_BAUD;
+		modbusParity = MODBUS_DEFAULT_PARITY;
+		modbusStopBits = MODBUS_DEFAULT_STOPBITS;
 
 #ifdef DEBUG_MODBUS
-	printf("parity = %c\r\n", parity);
+		printf("modbusBaud = %d\r\n", modbusBaud);
+		printf("modbusParity = ");
+		putchar(modbusParity);
+		printf("\r\n");
+		printf("modbusStopBits = %d\r\n", modbusStopBits);
 #endif
 
-	ctx = modbus_new_rtu(UART_PORT, (int)settings.mbBaud, parity, byteSize, (int)settings.mbStopB);
+		/* create file and write settings with defaults */
+		fp = fopen("/usr/local/etc/modbus_rs485_settings.txt", "w");
+		if (fp == NULL)
+		{
+			printf("Error while creating modbus settings file. Using default settings...\r\n");
+			modbusBaud = MODBUS_DEFAULT_BAUD;
+			modbusParity = MODBUS_DEFAULT_PARITY;
+			modbusStopBits = MODBUS_DEFAULT_STOPBITS;
+		}
+		else
+		{
+			/* write default settings to the new file */
+			snprintf(modbusSettingsStr, sizeof(modbusSettingsStr), "[MODBUS Settings] Baud_rate: %d, Parity: %c, Stop_bits: %d.", modbusBaud, modbusParity, modbusStopBits);
+			fprintf(fp, "%s", modbusSettingsStr);
+			fclose(fp);
+		}
+	}
+	else
+	{
+		/* read settings from file */
+		fgets(modbusSettingsStr, sizeof(modbusSettingsStr), fp);
+		if (modbusSettingsStr == NULL || ferror(fp))
+		{
+			/* use default settings */
+			printf("Error while reading 'modbus_rs485_settings.txt'. Using default settings...\r\n");
+			modbusBaud = MODBUS_DEFAULT_BAUD;
+			modbusParity = MODBUS_DEFAULT_PARITY;
+			modbusStopBits = MODBUS_DEFAULT_STOPBITS;
+			fclose(fp);
+		}
+		else
+		{
+			/* read settings from file and use them */
+#ifdef DEBUG_MODBUS
+			printf("Reading modbus settings from file...\r\n");
+			printf("%s\r\n", modbusSettingsStr);
+#endif
+			// find first setting (modbusBaud)
+			modbusRs485Settings = modbusGetSettings(modbusSettingsStr, index);
+			modbusBaud = atoi(modbusRs485Settings.bufStr);
+
+			// find 2nd setting (modbusParity)
+			modbusRs485Settings = modbusGetSettings(modbusSettingsStr, modbusRs485Settings.index + 1);
+			modbusParity = modbusRs485Settings.bufStr[0];
+
+			// find 3rd setting (modbusStopBits)
+			modbusRs485Settings = modbusGetSettings(modbusSettingsStr, modbusRs485Settings.index + 1);
+			modbusStopBits = atoi(modbusRs485Settings.bufStr);
+
+			fclose(fp);
+
+#ifdef DEBUG_MODBUS
+			printf("modbusBaud = %d\r\n", modbusBaud);
+			printf("modbusParity = ");
+			putchar(modbusParity);
+			printf("\r\n");
+			printf("modbusStopBits = %d\r\n", modbusStopBits);
+#endif
+		}
+	}
+
+	ctx = modbus_new_rtu(MODBUS_UART_PORT, modbusBaud, modbusParity, modbusByteSize, modbusStopBits);
 
 	if (ctx == NULL)
 	{
 		fprintf(stderr, "Unable to allocate libmodbus context\n");
 		return NULL;
 	}
-
 
 #ifdef DEBUG_MODBUS
 	if (modbus_set_debug(ctx, TRUE) == ERROR)
