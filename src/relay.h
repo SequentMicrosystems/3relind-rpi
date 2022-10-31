@@ -2,6 +2,7 @@
 #define RELAY3_H_
 
 #include <stdint.h>
+#include "modbus.h"
 
 #define RETRY_TIMES	10
 enum
@@ -29,6 +30,8 @@ enum
 
 #define CHANNEL_NR_MIN		1
 #define RELAY_CH_NR_MAX		3
+#define MODBUS_RELAY_CH_NR_MIN		0
+#define MODBUS_RELAY_CH_NR_MAX		2
 
 #define ERROR	-1
 #define OK		0
@@ -74,8 +77,12 @@ typedef struct
 	} ModbusSetingsType;
 	
 // RS-485 CLI structures
-	extern const CliCmdType CMD_RS485_READ;
-	extern const CliCmdType CMD_RS485_WRITE;
-	
-	int doBoardInit(int stack);
+extern const CliCmdType CMD_RS485_READ;
+extern const CliCmdType CMD_RS485_WRITE;
+extern const CliCmdType CMD_RS485_MODBUS_READ;
+extern const CliCmdType CMD_RS485_MODBUS_WRITE;
+
+int doBoardInit(int stack);
+int boardCheck(int hwAdd);
+modbus_t *doBoardModbusInit(int boardAddress);
 #endif //RELAY3_H_

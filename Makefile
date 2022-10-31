@@ -6,12 +6,12 @@ Q ?= @
 endif
 
 CC	= gcc
-CFLAGS	= $(DEBUG) -Wall -Wextra $(INCLUDE) -Winline -pipe 
+CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe 
 
 LDFLAGS	= -L$(DESTDIR)$(PREFIX)/lib
 LIBS    = -lpthread -lrt -lm -lcrypt
 
-SRC	=	src/relay.c src/comm.c src/thread.c src/rs485.c
+SRC	=	src/relay.c src/comm.c src/thread.c src/rs485.c src/modbus-data.c src/modbus-rtu.c src/modbus.c
 
 OBJ	=	$(SRC:.c=.o)
 
@@ -46,3 +46,4 @@ uninstall:
 	$Q echo "[UnInstall]"
 	$Q rm -f $(DESTDIR)$(PREFIX)/bin/3relind
 	$Q rm -f $(DESTDIR)$(PREFIX)/man/man1/3relind.1
+	$Q rm -f $(DESTDIR)$(PREFIX)/etc/modbus_rs485_settings.txt
