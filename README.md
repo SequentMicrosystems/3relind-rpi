@@ -16,8 +16,10 @@ Go to the "Interface Options">>"I2C" menu and select "Yes"
 ```bash
 ~$ sudo raspi-config
 ```
-Go to the "Interface Options">>"Serial Port" 
-Select "No" for login sell acces over serial
+Go to the "Interface Options">>"Serial Port".
+
+Select "No" for login sell acces over serial.
+
 Select "Yes" for enable serial port hardware.
 
  - Update your Raspberry PI and install the tools you need:
@@ -38,7 +40,7 @@ Now you can access all the functions of the relays board through the command "3r
 ```bash
 ~$ 3relind -h
 ```
-
+## Update
 If you clone the repository, any update can be made with the following commands:
 
 ```bash
