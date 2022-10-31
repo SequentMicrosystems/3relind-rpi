@@ -5,7 +5,7 @@
 # 3relind-rpi
 Drivers for Sequent Microsystems [Three 40A/240V Relays RS485 Daisy-chainable HAT for Raspberry Pi](https://sequentmicrosystems.com/collections/all-io-cards/products/three-40a-240v-relays-rs485-for-raspberry-pi)
 
-## Setup (first usage of a Sequent Microsystems card)
+## Setup (first usage of the card)
  - Enable the I2C communication:
 ```bash
 ~$ sudo raspi-config
