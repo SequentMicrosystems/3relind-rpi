@@ -276,7 +276,7 @@ modbus_t *modbusSetup(int boardAddress)
 #endif
 
 	if (modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK | MODBUS_ERROR_RECOVERY_PROTOCOL) == ERROR ||
-		modbus_set_slave(ctx, boardAddress + 1) == ERROR ||
+		modbus_set_slave(ctx, boardAddress) == ERROR ||
 		modbus_get_response_timeout(ctx, &sec_to, &usec_to) == ERROR)
 	{
 		printf("Fail to set slave ID!\n");

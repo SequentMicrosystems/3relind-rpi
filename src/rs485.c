@@ -242,8 +242,57 @@ int rs485ModbusGet()
 	fp = fopen("/usr/local/etc/modbus_rs485_settings.txt", "r");
 	if (fp == NULL)
 	{
-		printf("'modbus_rs485_settings.txt' does not exist!\r\n");
-		return ERROR;
+		/* use default settings */
+#ifdef DEBUG_MODBUS
+		printf("'modbus_rs485_settings.txt' does not exist. Using default settings...\r\n");
+#endif
+		modbusBaud = MODBUS_DEFAULT_BAUD;
+		modbusParity = MODBUS_DEFAULT_PARITY;
+		modbusStopBits = MODBUS_DEFAULT_STOPBITS;
+
+#ifdef DEBUG_MODBUS
+		printf("modbusBaud = %d\r\n", modbusBaud);
+		printf("modbusParity = ");
+		putchar(modbusParity);
+		printf("\r\n");
+		printf("modbusStopBits = %d\r\n", modbusStopBits);
+#endif
+
+		/* create file and write settings with defaults */
+		fp = fopen("/usr/local/etc/modbus_rs485_settings.txt", "w");
+		if (fp == NULL)
+		{
+			printf("Error while creating modbus settings file. Using default settings...\r\n");
+			modbusBaud = MODBUS_DEFAULT_BAUD;
+			modbusParity = MODBUS_DEFAULT_PARITY;
+			modbusStopBits = MODBUS_DEFAULT_STOPBITS;
+		}
+		else
+		{
+			/* write default settings to the new file */
+			snprintf(modbusSettingsStr, sizeof(modbusSettingsStr), "[MODBUS Settings] Baud_rate: %d, Parity: %c, Stop_bits: %d.", modbusBaud, modbusParity, modbusStopBits);
+			fprintf(fp, "%s", modbusSettingsStr);
+			fclose(fp);
+
+			/* print default settings */
+			switch (modbusParity)
+			{
+				case 'N':
+					modbusParityInt = 0;
+					break;
+				case 'E':
+					modbusParityInt = 1;
+					break;
+				case 'O':
+					modbusParityInt = 2;
+					break;
+				default:
+					modbusParityInt = 0;
+					break;
+			}
+
+			printf("<baudrate> <parity> <stopbits> %d %d %d\n", modbusBaud, modbusParityInt, modbusStopBits);
+		}
 	}
 	else
 	{

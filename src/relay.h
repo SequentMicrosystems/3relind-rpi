@@ -84,5 +84,5 @@ extern const CliCmdType CMD_RS485_MODBUS_WRITE;
 
 int doBoardInit(int stack);
 int boardCheck(int hwAdd);
-modbus_t *doBoardModbusInit(int stack);
+modbus_t *doBoardModbusInit(int boardAddress);
 #endif //RELAY3_H_

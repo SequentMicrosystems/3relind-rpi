@@ -100,7 +100,7 @@ const CliCmdType CMD_MODBUS_WRITE =
 	"\tmwrite:      Set modbus relays On/Off\n",
 	"\tUsage:       3relind <id> mwrite <channel> <on/off>\n",
 	"\tUsage:       3relind <id> mwrite <value>\n",
-	"\tExample:     3relind 0 mwrite 2 On; Set Modbus Relay #2 on Board #0 On\n"};
+	"\tExample:     3relind 1 mwrite 2 On; Set Modbus Relay #2 on Board #1 On\n"};
 
 static int doRelayRead(int argc, char *argv[]);
 const CliCmdType CMD_READ =
@@ -122,7 +122,7 @@ const CliCmdType CMD_MODBUS_READ =
 	"\tmread:       Read modbus relays status\n",
 	"\tUsage:       3relind <id> mread <channel>\n",
 	"\tUsage:       3relind <id> mread\n",
-	"\tExample:     3relind 0 mread 2; Read Status of Modbus Relay #2 on Board #0\n"};
+	"\tExample:     3relind 1 mread 2; Read Status of Modbus Relay #2 on Board #1\n"};
 
 static int doTest(int argc, char* argv[]);
 const CliCmdType CMD_TEST =
@@ -144,7 +144,7 @@ const CliCmdType CMD_MODBUS_TEST =
 	"\tmtest:       Turn ON and OFF the modbus relays until press a key\n",
 	"",
 	"\tUsage:       3relind <id> mtest\n",
-	"\tExample:     3relind 0 mtest\n"};
+	"\tExample:     3relind 1 mtest\n"};
 
 CliCmdType gCmdArray[CMD_ARRAY_SIZE];
 
@@ -425,19 +425,19 @@ int doBoardInit(int stack)
 	return dev;
 }
 
-modbus_t *doBoardModbusInit(int stack)
+modbus_t *doBoardModbusInit(int boardAddress)
 {
 	modbus_t *ctx = NULL;
 	int relayRegisterAddress = 0;
 	uint8_t relayReadState = 0;
 
-	if ( (stack < 0) || (stack > 7))
+	if ( (boardAddress < 1) || (boardAddress > 254))
 	{
-		printf("Invalid stack level [0..7]!\n");
+		printf("Invalid Modbus board address [1..254]!\n");
 		return NULL;
 	}
 
-	ctx = modbusSetup(stack);
+	ctx = modbusSetup(boardAddress);
 	if (ctx == NULL)
 	{
 		printf("Error at modbus setup!\n");
@@ -446,7 +446,7 @@ modbus_t *doBoardModbusInit(int stack)
 
 	if (modbusRead(ctx, relayRegisterAddress, &relayReadState) == ERROR)
 	{
-		printf("3relind board id %d not detected\n", stack);
+		printf("3relind board id %d not detected\n", boardAddress);
 		modbus_close(ctx);
 		modbus_free(ctx);
 		return NULL;
@@ -594,7 +594,7 @@ static int doRelayWrite(int argc, char *argv[])
 static int doRelayModbusWrite(int argc, char *argv[])
 {
 	modbus_t *ctx = NULL;
-	int stack = atoi(argv[1]);
+	int boardAddress = atoi(argv[1]);
 	int relay_number = 0;
 	int relay_value = 0;
 	OutStateEnumType relay_stateR = STATE_COUNT;
@@ -608,7 +608,7 @@ static int doRelayModbusWrite(int argc, char *argv[])
 		return ARG_CNT_ERR;
 	}
 
-	ctx = doBoardModbusInit(stack);
+	ctx = doBoardModbusInit(boardAddress);
 	if (ctx == NULL)
 	{
 		return COMM_ERR;
@@ -775,11 +775,11 @@ static int doRelayRead(int argc, char *argv[])
 static int doRelayModbusRead(int argc, char *argv[])
 {
 	modbus_t *ctx = NULL;
-	int stack = atoi(argv[1]);
+	int boardAddress = atoi(argv[1]);
 	int relay_number = 0;
 	uint8_t relay_state = 0;
 	
-	ctx = doBoardModbusInit(stack);
+	ctx = doBoardModbusInit(boardAddress);
 
 	if (ctx == NULL)
 	{
