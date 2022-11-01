@@ -97,10 +97,10 @@ const CliCmdType CMD_MODBUS_WRITE =
 	"mwrite",
 	2,
 	&doRelayModbusWrite,
-	"\tmwrite:      Set modbus relays On/Off\n",
-	"\tUsage:       3relind <id> mwrite <channel> <on/off>\n",
-	"\tUsage:       3relind <id> mwrite <value>\n",
-	"\tExample:     3relind 1 mwrite 2 On; Set Modbus Relay #2 on Board #1 On\n"};
+	"\tmwrite:      Set the relays On/Off for the cards conected through Modbus\n",
+	"\tUsage:       3relind <address> mwrite <channel> <on/off>\n",
+	"\tUsage:       3relind <address> mwrite <value>\n",
+	"\tExample:     3relind 1 mwrite 2 On; Set Modbus Relay #2 on Board with modbus address 1 On\n"};
 
 static int doRelayRead(int argc, char *argv[]);
 const CliCmdType CMD_READ =
@@ -119,10 +119,10 @@ const CliCmdType CMD_MODBUS_READ =
 	"mread",
 	2,
 	&doRelayModbusRead,
-	"\tmread:       Read modbus relays status\n",
-	"\tUsage:       3relind <id> mread <channel>\n",
-	"\tUsage:       3relind <id> mread\n",
-	"\tExample:     3relind 1 mread 2; Read Status of Modbus Relay #2 on Board #1\n"};
+	"\tmread:       Read relays status for the card connected over Modbus\n",
+	"\tUsage:       3relind <address> mread <channel>\n",
+	"\tUsage:       3relind <address> mread\n",
+	"\tExample:     3relind 1 mread 2; Read Status of Relay #2 on Board with modbus address 1\n"};
 
 static int doTest(int argc, char* argv[]);
 const CliCmdType CMD_TEST =
@@ -141,9 +141,9 @@ const CliCmdType CMD_MODBUS_TEST =
 	"mtest",
 	2,
 	&doModbusTest,
-	"\tmtest:       Turn ON and OFF the modbus relays until press a key\n",
+	"\tmtest:       Turn ON and OFF the relays of a card conected on modbuss until press a key\n",
 	"",
-	"\tUsage:       3relind <id> mtest\n",
+	"\tUsage:       3relind <address> mtest\n",
 	"\tExample:     3relind 1 mtest\n"};
 
 CliCmdType gCmdArray[CMD_ARRAY_SIZE];
@@ -154,14 +154,14 @@ char *usage = "Usage:	 3relind -h <command>\n"
 	"         3relind -list\n"
 	"         3relind <id> write <channel> <on/off>\n"
 	"         3relind <id> write <value>\n"
-	"         3relind <id> mwrite <channel> <on/off>\n"
-	"         3relind <id> mwrite <value>\n"
+	"         3relind <address> mwrite <channel> <on/off>\n"
+	"         3relind <address> mwrite <value>\n"
 	"         3relind <id> read <channel>\n"
 	"         3relind <id> read\n"
-	"         3relind <id> mread <channel>\n"
-	"         3relind <id> mread\n"
+	"         3relind <address> mread <channel>\n"
+	"         3relind <address> mread\n"
 	"         3relind <id> test\n"
-	"         3relind <id> mtest\n"
+	"         3relind <address> mtest\n"
 	"         3relind <id> cfg485rd\n"
 	"         3relind <id> cfg485wr\n"
 	"         3relind cfgmbrd\n"
