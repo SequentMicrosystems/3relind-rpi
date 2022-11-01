@@ -7,16 +7,18 @@ You can set-up the RS-485 port with **3relind** command.
 
 Example:
 ```bash
-~$ 3relind 0 rs485wr 1 9600 1 0 1
+~$ 3relind 0 cfg485wr 1 9600 1 0 1
 ```
-Set Modbus RTU , Baudrate: 9600bps, 1 Stop Bit,  parity: None, slave address offset: 1
+Set Modbus RTU , Baudrate: 9600bps, 1 Stop Bit,  parity: None, slave address base: 1
 ```bash
 ~$ 3relind -h rs485wr
 ```
 display the full set of options
 
 ## Slave Address
-The slave address is add with the "stack level" jumpers. For example the jumpers configuration for stack level 1  (one jumper in position ID0) slave address offset to 1 corespond to slave address 2.
+The five address switches have a dual purpose. 
+When the card is accessed from Raspberry Pi, the switches define the offset of the I2C address, permitting changing the adress to avoid adress conflict on the bus.
+When the card is accessed through MODBUS protocol over the RS485 port, the switches define the offset of the RS485 base address set by the software.
 
 ## Modbus object types
 All modbus RTU object type with standard addresses are implemented : Coils, Discrete Inputs, Input registers, Holding registers.
