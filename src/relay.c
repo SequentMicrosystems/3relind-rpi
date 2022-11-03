@@ -22,15 +22,15 @@
 
 #define VERSION_BASE	(int)1
 #define VERSION_MAJOR	(int)1
-#define VERSION_MINOR	(int)1
+#define VERSION_MINOR	(int)2
 
 #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #define CMD_ARRAY_SIZE	14
 
 int relaySet(int dev, int val);
-int relayGet(int dev, int* val);
+int relayGet(int dev, int *val);
 int relayChSet(int dev, u8 channel, OutStateEnumType state);
-int relayChGet(int dev, u8 channel, OutStateEnumType* state);
+int relayChGet(int dev, u8 channel, OutStateEnumType *state);
 int relayModbusSet(modbus_t *ctx, uint8_t state);
 int relayModbusGet(modbus_t *ctx, uint8_t *state);
 int relayChModbusSet(modbus_t *ctx, int channel, uint8_t state);
@@ -38,14 +38,14 @@ int relayChModbusGet(modbus_t *ctx, int channel, uint8_t *state);
 
 static int doHelp(int argc, char *argv[]);
 const CliCmdType CMD_HELP =
-{
-	"-h",
-	1,
-	&doHelp,
-	"\t-h           Display the list of command options or one command option details\n",
-	"\tUsage:       3relind -h    Display command options list\n",
-	"\tUsage:       3relind -h <param>   Display help for <param> command option\n",
-	"\tExample:     3relind -h write    Display help for \"write\" command option\n"};
+	{
+		"-h",
+		1,
+		&doHelp,
+		"\t-h           Display the list of command options or one command option details\n",
+		"\tUsage:       3relind -h    Display command options list\n",
+		"\tUsage:       3relind -h <param>   Display help for <param> command option\n",
+		"\tExample:     3relind -h write    Display help for \"write\" command option\n"};
 
 static int doVersion(int argc, char *argv[]);
 const CliCmdType CMD_VERSION =
@@ -58,7 +58,7 @@ const CliCmdType CMD_VERSION =
 	"",
 	"\tExample:     3relind -v  Display the version number\n"};
 
-static int doWarranty(int argc, char* argv[]);
+static int doWarranty(int argc, char *argv[]);
 const CliCmdType CMD_WAR =
 {
 	"-warranty",
@@ -71,14 +71,14 @@ const CliCmdType CMD_WAR =
 
 static int doList(int argc, char *argv[]);
 const CliCmdType CMD_LIST =
-{
-	"-list",
-	1,
-	&doList,
-	"\t-list:       List all 3relind boards connected,\n\treturn       nr of boards and stack level for every board\n",
-	"\tUsage:       3relind -list\n",
-	"",
-	"\tExample:     3relind -list display: 1,0 \n"};
+	{
+		"-list",
+		1,
+		&doList,
+		"\t-list:       List all 3relind boards connected,\n\treturn       nr of boards and stack level for every board\n",
+		"\tUsage:       3relind -list\n",
+		"",
+		"\tExample:     3relind -list display: 1,0 \n"};
 
 static int doRelayWrite(int argc, char *argv[]);
 const CliCmdType CMD_WRITE =
@@ -93,14 +93,14 @@ const CliCmdType CMD_WRITE =
 
 static int doRelayModbusWrite(int argc, char *argv[]);
 const CliCmdType CMD_MODBUS_WRITE =
-{
-	"mwrite",
-	2,
-	&doRelayModbusWrite,
-	"\tmwrite:      Set the relays On/Off for the cards conected through Modbus\n",
-	"\tUsage:       3relind <address> mwrite <channel> <on/off>\n",
-	"\tUsage:       3relind <address> mwrite <value>\n",
-	"\tExample:     3relind 1 mwrite 2 On; Set Modbus Relay #2 on Board with modbus address 1 On\n"};
+	{
+		"mwrite",
+		2,
+		&doRelayModbusWrite,
+		"\tmwrite:      Set the relays On/Off for the cards conected through Modbus\n",
+		"\tUsage:       3relind <address> mwrite <channel> <on/off>\n",
+		"\tUsage:       3relind <address> mwrite <value>\n",
+		"\tExample:     3relind 1 mwrite 2 On; Set Modbus Relay #2 on Board with modbus address 1 On\n"};
 
 static int doRelayRead(int argc, char *argv[]);
 const CliCmdType CMD_READ =
@@ -115,16 +115,16 @@ const CliCmdType CMD_READ =
 
 static int doRelayModbusRead(int argc, char *argv[]);
 const CliCmdType CMD_MODBUS_READ =
-{
-	"mread",
-	2,
-	&doRelayModbusRead,
-	"\tmread:       Read relays status for the card connected over Modbus\n",
-	"\tUsage:       3relind <address> mread <channel>\n",
-	"\tUsage:       3relind <address> mread\n",
-	"\tExample:     3relind 1 mread 2; Read Status of Relay #2 on Board with modbus address 1\n"};
+	{
+		"mread",
+		2,
+		&doRelayModbusRead,
+		"\tmread:       Read relays status for the card connected over Modbus\n",
+		"\tUsage:       3relind <address> mread <channel>\n",
+		"\tUsage:       3relind <address> mread\n",
+		"\tExample:     3relind 1 mread 2; Read Status of Relay #2 on Board with modbus address 1\n"};
 
-static int doTest(int argc, char* argv[]);
+static int doTest(int argc, char *argv[]);
 const CliCmdType CMD_TEST =
 {
 	"test",
@@ -135,42 +135,22 @@ const CliCmdType CMD_TEST =
 	"\tUsage:       3relind <id> test\n",
 	"\tExample:     3relind 0 test\n"};
 
-static int doModbusTest(int argc, char* argv[]);
+static int doModbusTest(int argc, char *argv[]);
 const CliCmdType CMD_MODBUS_TEST =
-{
-	"mtest",
-	2,
-	&doModbusTest,
-	"\tmtest:       Turn ON and OFF the relays of a card conected on modbuss until press a key\n",
-	"",
-	"\tUsage:       3relind <address> mtest\n",
-	"\tExample:     3relind 1 mtest\n"};
+	{
+		"mtest",
+		2,
+		&doModbusTest,
+		"\tmtest:       Turn ON and OFF the relays of a card conected on modbuss until press a key\n",
+		"",
+		"\tUsage:       3relind <address> mtest\n",
+		"\tExample:     3relind 1 mtest\n"};
 
 CliCmdType gCmdArray[CMD_ARRAY_SIZE];
 
-char *usage = "Usage:	 3relind -h <command>\n"
-	"         3relind -v\n"
-	"         3relind -warranty\n"
-	"         3relind -list\n"
-	"         3relind <id> write <channel> <on/off>\n"
-	"         3relind <id> write <value>\n"
-	"         3relind <address> mwrite <channel> <on/off>\n"
-	"         3relind <address> mwrite <value>\n"
-	"         3relind <id> read <channel>\n"
-	"         3relind <id> read\n"
-	"         3relind <address> mread <channel>\n"
-	"         3relind <address> mread\n"
-	"         3relind <id> test\n"
-	"         3relind <address> mtest\n"
-	"         3relind <id> cfg485rd\n"
-	"         3relind <id> cfg485wr\n"
-	"         3relind cfgmbrd\n"
-	"         3relind cfgmbwr\n"
-	"Where: <id> = Board level id = 0..7\n"
-	"Type 3relind -h <command> for more help"; // No trailing newline needed here.
 
 char *warranty =
-	"	       Copyright (c) 2016-2020 Sequent Microsystems\n"
+	"	       Copyright (c) 2016-2022 Sequent Microsystems\n"
 		"                                                             \n"
 		"		This program is free software; you can redistribute it and/or modify\n"
 		"		it under the terms of the GNU Leser General Public License as published\n"
@@ -225,14 +205,15 @@ int relayChModbusSet(modbus_t *ctx, int channel, uint8_t state)
 		printf("Modbus context NULL!\r\n");
 		return ERROR;
 	}
-	
-	if ((channel < MODBUS_RELAY_CH_NR_MIN) || (channel > MODBUS_RELAY_CH_NR_MAX))
+
+	if ( (channel < MODBUS_RELAY_CH_NR_MIN)
+		|| (channel > MODBUS_RELAY_CH_NR_MAX))
 	{
 		printf("Invalid relay nr!\n");
 		return ERROR;
 	}
 
-	if ((state != OFF) && (state != ON))
+	if ( (state != OFF) && (state != ON))
 	{
 		printf("Invalid relay state!\n");
 		return ERROR;
@@ -247,7 +228,7 @@ int relayChModbusSet(modbus_t *ctx, int channel, uint8_t state)
 	return OK;
 }
 
-int relayChGet(int dev, u8 channel, OutStateEnumType* state)
+int relayChGet(int dev, u8 channel, OutStateEnumType *state)
 {
 	u8 buff[2];
 
@@ -286,7 +267,8 @@ int relayChModbusGet(modbus_t *ctx, int channel, uint8_t *state)
 		return ERROR;
 	}
 
-	if ((channel < MODBUS_RELAY_CH_NR_MIN) || (channel > MODBUS_RELAY_CH_NR_MAX))
+	if ( (channel < MODBUS_RELAY_CH_NR_MIN)
+		|| (channel > MODBUS_RELAY_CH_NR_MAX))
 	{
 		printf("Invalid relay nr!\n");
 		return ERROR;
@@ -339,10 +321,10 @@ int relayModbusSet(modbus_t *ctx, uint8_t state)
 	else
 	{
 		/* Convert state to binary */
-		for(i = 0; state > 0; i++)
+		for (i = 0; state > 0; i++)
 		{
-			a[i] = state%2;
-			state = state/2;
+			a[i] = state % 2;
+			state = state / 2;
 		}
 
 		for (i = 0; i < RELAY_CH_NR_MAX; i++)
@@ -358,7 +340,7 @@ int relayModbusSet(modbus_t *ctx, uint8_t state)
 	return OK;
 }
 
-int relayGet(int dev, int* val)
+int relayGet(int dev, int *val)
 {
 	u8 buff[2];
 
@@ -385,16 +367,16 @@ int relayModbusGet(modbus_t *ctx, uint8_t *state)
 		return ERROR;
 	}
 
-	if (relayChModbusGet(ctx, relay_number, &state_0) != OK ||
-		relayChModbusGet(ctx, relay_number + 1, &state_1) != OK ||
-		relayChModbusGet(ctx, relay_number + 2, &state_2) != OK)
+	if (relayChModbusGet(ctx, relay_number, &state_0) != OK
+		|| relayChModbusGet(ctx, relay_number + 1, &state_1) != OK
+		|| relayChModbusGet(ctx, relay_number + 2, &state_2) != OK)
 	{
 		printf("Fail to read relays!\n");
 		return ERROR;
 	}
 
 	/* Convert state to decimal */
-	*state = state_0 + (2*state_1) + (4*state_2);
+	*state = state_0 + (2 * state_1) + (4 * state_2);
 
 	return OK;
 }
@@ -425,7 +407,7 @@ int doBoardInit(int stack)
 	return dev;
 }
 
-modbus_t *doBoardModbusInit(int boardAddress)
+modbus_t* doBoardModbusInit(int boardAddress)
 {
 	modbus_t *ctx = NULL;
 	int relayRegisterAddress = 0;
@@ -600,7 +582,7 @@ static int doRelayModbusWrite(int argc, char *argv[])
 	OutStateEnumType relay_stateR = STATE_COUNT;
 	OutStateEnumType relay_state = STATE_COUNT;
 	int retry = 0;
-	
+
 	if ( (argc != 5) && (argc != 4))
 	{
 		printf("Usage: 3relind <id> mwrite <relay number> <on/off> \n");
@@ -617,7 +599,8 @@ static int doRelayModbusWrite(int argc, char *argv[])
 	if (argc == 5)
 	{
 		relay_number = atoi(argv[3]);
-		if ((relay_number < MODBUS_RELAY_CH_NR_MIN + 1) || (relay_number > MODBUS_RELAY_CH_NR_MAX + 1))
+		if ( (relay_number < MODBUS_RELAY_CH_NR_MIN + 1)
+			|| (relay_number > MODBUS_RELAY_CH_NR_MAX + 1))
 		{
 			printf("Relay number value out of range!\n");
 			modbus_close(ctx);
@@ -627,19 +610,18 @@ static int doRelayModbusWrite(int argc, char *argv[])
 
 		relay_number = relay_number - 1;
 
-		if ((strcasecmp(argv[4], "up") == 0) ||
-			(strcasecmp(argv[4], "on") == 0))
+		if ( (strcasecmp(argv[4], "up") == 0) || (strcasecmp(argv[4], "on") == 0))
 		{
 			relay_state = ON;
 		}
-		else if ((strcasecmp(argv[4], "down") == 0) ||
-			     (strcasecmp(argv[4], "off") == 0))
+		else if ( (strcasecmp(argv[4], "down") == 0)
+			|| (strcasecmp(argv[4], "off") == 0))
 		{
 			relay_state = OFF;
 		}
 		else
 		{
-			if ((atoi(argv[4]) >= STATE_COUNT) || (atoi(argv[4]) < OFF))
+			if ( (atoi(argv[4]) >= STATE_COUNT) || (atoi(argv[4]) < OFF))
 			{
 				printf("Invalid relay state!\n");
 				modbus_close(ctx);
@@ -651,7 +633,7 @@ static int doRelayModbusWrite(int argc, char *argv[])
 
 		retry = RETRY_TIMES;
 
-		while ((retry > 0) && (relay_stateR != relay_state))
+		while ( (retry > 0) && (relay_stateR != relay_state))
 		{
 			if (relayChModbusSet(ctx, relay_number, (uint8_t)relay_state) != OK)
 			{
@@ -660,7 +642,7 @@ static int doRelayModbusWrite(int argc, char *argv[])
 				modbus_free(ctx);
 				return COMM_ERR;
 			}
-			if (relayChModbusGet(ctx, relay_number, (uint8_t *)&relay_stateR) != OK)
+			if (relayChModbusGet(ctx, relay_number, (uint8_t*)&relay_stateR) != OK)
 			{
 				printf("Fail to read relay\n");
 				modbus_close(ctx);
@@ -778,7 +760,7 @@ static int doRelayModbusRead(int argc, char *argv[])
 	int boardAddress = atoi(argv[1]);
 	int relay_number = 0;
 	uint8_t relay_state = 0;
-	
+
 	ctx = doBoardModbusInit(boardAddress);
 
 	if (ctx == NULL)
@@ -790,7 +772,8 @@ static int doRelayModbusRead(int argc, char *argv[])
 	{
 		relay_number = atoi(argv[3]);
 
-		if ((relay_number < MODBUS_RELAY_CH_NR_MIN + 1) || (relay_number > MODBUS_RELAY_CH_NR_MAX + 1))
+		if ( (relay_number < MODBUS_RELAY_CH_NR_MIN + 1)
+			|| (relay_number > MODBUS_RELAY_CH_NR_MAX + 1))
 		{
 			printf("Relay number value out of range!\n");
 			modbus_close(ctx);
@@ -862,12 +845,20 @@ static int doHelp(int argc, char *argv[])
 		if (CMD_ARRAY_SIZE == i)
 		{
 			printf("Option \"%s\" not found\n", argv[2]);
-			printf("%s: %s\n", argv[0], usage);
+			for (i = 0; i < CMD_ARRAY_SIZE; i++)
+			{
+				printf("%s%s", gCmdArray[i].usage1,
+					gCmdArray[i].usage2);
+			}
 		}
 	}
 	else
 	{
-		printf("%s: %s\n", argv[0], usage);
+		for (i = 0; i < CMD_ARRAY_SIZE; i++)
+		{
+			printf("%s%s", gCmdArray[i].usage1,
+				gCmdArray[i].usage2);
+		}
 	}
 	return OK;
 }
@@ -918,7 +909,7 @@ static int doList(int argc, char *argv[])
 /* 
  * Self test for production
  */
-static int doTest(int argc, char* argv[])
+static int doTest(int argc, char *argv[])
 {
 	int dev = 0;
 	int i = 0;
@@ -926,7 +917,7 @@ static int doTest(int argc, char* argv[])
 	int relVal;
 	int valR;
 	int relayResult = 0;
-	FILE* file = NULL;
+	FILE *file = NULL;
 	const u8 relayOrder[8] =
 	{
 		1,
@@ -1057,7 +1048,7 @@ static int doTest(int argc, char* argv[])
 	return OK;
 }
 
-static int doModbusTest(int argc, char* argv[])
+static int doModbusTest(int argc, char *argv[])
 {
 	modbus_t *ctx = NULL;
 	int i = 0;
@@ -1065,7 +1056,7 @@ static int doModbusTest(int argc, char* argv[])
 	int relVal;
 	uint8_t valR;
 	int relayResult = 0;
-	FILE* file = NULL;
+	FILE *file = NULL;
 	const u8 relayOrder[8] =
 	{
 		1,
@@ -1209,7 +1200,9 @@ static void cliInit(void)
 	int i = 0;
 
 	memset(gCmdArray, 0, sizeof(CliCmdType) * CMD_ARRAY_SIZE);
-
+	
+	memcpy(&gCmdArray[i], &CMD_VERSION, sizeof(CliCmdType));
+	i++;
 	memcpy(&gCmdArray[i], &CMD_HELP, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_WAR, sizeof(CliCmdType));
@@ -1228,8 +1221,6 @@ static void cliInit(void)
 	i++;
 	memcpy(&gCmdArray[i], &CMD_MODBUS_TEST, sizeof(CliCmdType));
 	i++;
-	memcpy(&gCmdArray[i], &CMD_VERSION, sizeof(CliCmdType));
-	i++;
 	memcpy(&gCmdArray[i], &CMD_RS485_READ, sizeof(CliCmdType));
 	i++;
 	memcpy(&gCmdArray[i], &CMD_RS485_WRITE, sizeof(CliCmdType));
@@ -1247,7 +1238,11 @@ int main(int argc, char *argv[])
 
 	if (argc == 1)
 	{
-		printf("%s\n", usage);
+		for (i = 0; i < CMD_ARRAY_SIZE; i++)
+		{
+			printf("%s%s", gCmdArray[i].usage1,
+				gCmdArray[i].usage2);
+		}
 		return 1;
 	}
 	for (i = 0; i < CMD_ARRAY_SIZE; i++)
@@ -1262,7 +1257,11 @@ int main(int argc, char *argv[])
 		}
 	}
 	printf("Invalid command option\n");
-	printf("%s\n", usage);
+	for (i = 0; i < CMD_ARRAY_SIZE; i++)
+	{
+		printf("%s%s", gCmdArray[i].usage1,
+			gCmdArray[i].usage2);
+	}
 
 	return 0;
 }
