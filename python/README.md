@@ -69,7 +69,7 @@ Set all relays state.
 
 address - address of the 3-Relay card (selectable from address microswitches [0..7])
 
-value - 3 bit value of all relays (ex: 255: turn on all relays, 0: turn off all relays, 1:turn on relay #1 and off the rest)
+value - 3 bit value of all relays (ex: 7: turn on all relays, 0: turn off all relays, 1:turn on relay #1 and off the rest)
 
 ### get(address, relay)
 Get one relay state.
