@@ -7,16 +7,9 @@ import minimalmodbus
 DEVICE_ADDRESS = 0x60  # 7 bit address (will be left shifted to add the read write bit)
 
 RELAY3_INPORT_REG_ADD = 0x00
-RELAY3_OUTPORT_REG_ADD = 0x01
-RELAY3_POLINV_REG_ADD = 0x02
-RELAY3_CFG_REG_ADD = 0x03
 
 
 def __check(bus, add):
-    cfg = bus.read_byte_data(add, RELAY3_CFG_REG_ADD)
-    if cfg != 0:
-        bus.write_byte_data(add, RELAY3_CFG_REG_ADD, 0)
-        bus.write_byte_data(add, RELAY3_OUTPORT_REG_ADD, 0)
     return bus.read_byte_data(add, RELAY3_INPORT_REG_ADD)
 
 
@@ -76,6 +69,8 @@ def set(address, relay, value):
         raise ValueError('Invalid relay number!')
     if relay > 3:
         raise ValueError('Invalid relay number!')
+    if value < 0 or value > 1:
+        raise ValueError('Invalid relay value!')
     bus = smbus.SMBus(1)
     hwAdd = DEVICE_ADDRESS + address
     try:
