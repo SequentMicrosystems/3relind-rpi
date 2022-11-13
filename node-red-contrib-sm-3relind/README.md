@@ -1,4 +1,4 @@
-# node-red-contrib-sm-8relind
+# node-red-contrib-sm-3relind
 
 This is the node-red node to control Sequent Microsystems [Three 40A/240V Relays RS485 Daisy-chainable HAT for Raspberry Pi](https://sequentmicrosystems.com/collections/all-io-cards/products/three-40a-240v-relays-rs485-for-raspberry-pi).
 

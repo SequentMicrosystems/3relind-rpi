@@ -1,0 +1,1123 @@
+[
+    {
+        "id": "8053da30.9f5288",
+        "type": "tab",
+        "label": "Modbus Usage Example",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "c77514e2.cac378",
+        "type": "ui_switch",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "label": "Toggle Selected Relay",
+        "tooltip": "",
+        "group": "96b947ff.55f348",
+        "order": 4,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 940,
+        "y": 260,
+        "wires": [
+            [
+                "9b49653206d07764",
+                "fa4abaa572c471a7"
+            ]
+        ]
+    },
+    {
+        "id": "75a143b1.68e99c",
+        "type": "ui_numeric",
+        "z": "8053da30.9f5288",
+        "name": "Set all relays (numeric)",
+        "label": "",
+        "tooltip": "",
+        "group": "96b947ff.55f348",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "255",
+        "step": 1,
+        "className": "",
+        "x": 680,
+        "y": 740,
+        "wires": [
+            [
+                "c3a7442e8fe21cf5",
+                "2dc14ca5c4c30a74"
+            ]
+        ]
+    },
+    {
+        "id": "f36ad807dab6a48b",
+        "type": "ui_dropdown",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "label": "Select Relay",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "96b947ff.55f348",
+        "order": 3,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "Relay 1",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "Relay 2",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "Relay 3",
+                "value": 3,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 390,
+        "y": 220,
+        "wires": [
+            [
+                "1558582fb4474ef1"
+            ]
+        ]
+    },
+    {
+        "id": "4955ab0b01996453",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 210,
+        "y": 220,
+        "wires": [
+            [
+                "f36ad807dab6a48b"
+            ]
+        ]
+    },
+    {
+        "id": "ba35cf5d8d911cce",
+        "type": "ui_text",
+        "z": "8053da30.9f5288",
+        "group": "96b947ff.55f348",
+        "order": 6,
+        "width": 5,
+        "height": 1,
+        "name": "Display state of selected relay",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 1550,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "8bf6f057623dee64",
+        "type": "ui_button",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "group": "96b947ff.55f348",
+        "order": 5,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Read Selected Relay",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 340,
+        "y": 480,
+        "wires": [
+            [
+                "3bf891f9bcd835ef",
+                "c1667bd693942ea6"
+            ]
+        ]
+    },
+    {
+        "id": "9af4ed3bee7726b7",
+        "type": "ui_button",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "group": "96b947ff.55f348",
+        "order": 10,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Read all relays",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 320,
+        "y": 940,
+        "wires": [
+            [
+                "bcca2f58465ea552",
+                "1b26c184ef0a021c"
+            ]
+        ]
+    },
+    {
+        "id": "daf00a98a273c69b",
+        "type": "ui_text",
+        "z": "8053da30.9f5288",
+        "group": "96b947ff.55f348",
+        "order": 11,
+        "width": 5,
+        "height": 1,
+        "name": "Display value of all relays",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 1570,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "f56be50986236638",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 210,
+        "y": 140,
+        "wires": [
+            [
+                "b67f6e727a1a5474"
+            ]
+        ]
+    },
+    {
+        "id": "d2a1902fe02256d6",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "x": 450,
+        "y": 680,
+        "wires": [
+            [
+                "e7b3ab2e7bb80348",
+                "75a143b1.68e99c"
+            ]
+        ]
+    },
+    {
+        "id": "b67f6e727a1a5474",
+        "type": "ui_numeric",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "label": "Set Board Address",
+        "tooltip": "",
+        "group": "96b947ff.55f348",
+        "order": 1,
+        "width": 5,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": "1",
+        "max": "254",
+        "step": 1,
+        "className": "",
+        "x": 410,
+        "y": 140,
+        "wires": [
+            [
+                "7ad1d3a5255d16df"
+            ]
+        ]
+    },
+    {
+        "id": "31f78165b25726dd",
+        "type": "ui_button",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "group": "96b947ff.55f348",
+        "order": 9,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "Reset values",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 290,
+        "y": 740,
+        "wires": [
+            [
+                "db9d4f496b6a216b"
+            ]
+        ]
+    },
+    {
+        "id": "e7b3ab2e7bb80348",
+        "type": "ui_dropdown",
+        "z": "8053da30.9f5288",
+        "name": "Set all relays (dropdown)",
+        "label": "Set all relays",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "96b947ff.55f348",
+        "order": 7,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "0",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "1",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "2",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "3",
+                "value": 3,
+                "type": "num"
+            },
+            {
+                "label": "4",
+                "value": 4,
+                "type": "num"
+            },
+            {
+                "label": "5",
+                "value": 5,
+                "type": "num"
+            },
+            {
+                "label": "6",
+                "value": 6,
+                "type": "num"
+            },
+            {
+                "label": "7",
+                "value": 7,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 690,
+        "y": 680,
+        "wires": [
+            [
+                "c3a7442e8fe21cf5",
+                "c53ae7fb70654a8d"
+            ]
+        ]
+    },
+    {
+        "id": "7ad1d3a5255d16df",
+        "type": "change",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "boardAddress",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1558582fb4474ef1",
+        "type": "change",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "relayNumber",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9b49653206d07764",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Change relay state; Prepare message",
+        "func": "var toggleValue = msg.payload;\nvar boardAddress = flow.get(\"boardAddress\");\nvar relayNumber = flow.get(\"relayNumber\");\nrelayNumber -= 1;\n\nmsg.payload = { \n    value: toggleValue,\n    'fc': 5, \n    'unitid': boardAddress, \n    'address': relayNumber, \n    'quantity': 1 }\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1230,
+        "y": 260,
+        "wires": [
+            [
+                "b7a0e97d5e978d18"
+            ]
+        ]
+    },
+    {
+        "id": "b7a0e97d5e978d18",
+        "type": "modbus-flex-write",
+        "z": "8053da30.9f5288",
+        "name": "modbus_write_singleRelay",
+        "showStatusActivities": true,
+        "showErrors": true,
+        "server": "b04279f80c449024",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 1540,
+        "y": 260,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d0ca2bf73ffef6a2",
+        "type": "ui_text",
+        "z": "8053da30.9f5288",
+        "group": "96b947ff.55f348",
+        "order": 2,
+        "width": 5,
+        "height": 1,
+        "name": "Connection error",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 1430,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "e752bd5cb9dabb2e",
+        "type": "catch",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "scope": [
+            "b7a0e97d5e978d18",
+            "9da0d7b4470f28e1",
+            "273f3a0ab19034c7",
+            "50de2631dd13c1c0"
+        ],
+        "uncaught": false,
+        "x": 990,
+        "y": 140,
+        "wires": [
+            [
+                "c051f8cc0cc5c375"
+            ]
+        ]
+    },
+    {
+        "id": "c051f8cc0cc5c375",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Print error message",
+        "func": "var errorMessage = msg.error;\n\nif (errorMessage != null)\n{\n    msg.payload = \"Connection error!\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 140,
+        "wires": [
+            [
+                "d0ca2bf73ffef6a2"
+            ]
+        ]
+    },
+    {
+        "id": "7a90810d1e6613a4",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Delete error message",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 80,
+        "wires": [
+            [
+                "d0ca2bf73ffef6a2"
+            ]
+        ]
+    },
+    {
+        "id": "f13ada412a07e208",
+        "type": "link in",
+        "z": "8053da30.9f5288",
+        "name": "link in 1",
+        "links": [
+            "fa4abaa572c471a7",
+            "c1667bd693942ea6",
+            "c53ae7fb70654a8d",
+            "2dc14ca5c4c30a74",
+            "bcca2f58465ea552"
+        ],
+        "x": 1005,
+        "y": 80,
+        "wires": [
+            [
+                "7a90810d1e6613a4"
+            ]
+        ]
+    },
+    {
+        "id": "fa4abaa572c471a7",
+        "type": "link out",
+        "z": "8053da30.9f5288",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "f13ada412a07e208",
+            "cd66873e9a1b4e45"
+        ],
+        "x": 1085,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "3bf891f9bcd835ef",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Read relay state; Prepare message",
+        "func": "var boardAddress = flow.get(\"boardAddress\");\nvar relayNumber = flow.get(\"relayNumber\");\nrelayNumber -= 1;\n\nmsg.payload = { \n    'fc': 1, \n    'unitid': boardAddress, \n    'address': relayNumber, \n    'quantity': 1 }\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 480,
+        "wires": [
+            [
+                "9da0d7b4470f28e1"
+            ]
+        ]
+    },
+    {
+        "id": "9da0d7b4470f28e1",
+        "type": "modbus-flex-getter",
+        "z": "8053da30.9f5288",
+        "name": "modbus_read_singleRelay",
+        "showStatusActivities": true,
+        "showErrors": true,
+        "logIOActivities": false,
+        "server": "b04279f80c449024",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 880,
+        "y": 480,
+        "wires": [
+            [],
+            [
+                "0e34686dd00a98f9"
+            ]
+        ]
+    },
+    {
+        "id": "0e34686dd00a98f9",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Hex to Dec",
+        "func": "var relayState = msg.payload.buffer[0]\nparseInt(relayState);\nmsg.payload = relayState;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 480,
+        "wires": [
+            [
+                "27c76be76869a161"
+            ]
+        ]
+    },
+    {
+        "id": "13a3dd353aa23b9c",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "test",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 370,
+        "y": 420,
+        "wires": [
+            [
+                "3bf891f9bcd835ef"
+            ]
+        ]
+    },
+    {
+        "id": "b097f5f129cadc2e",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "test true",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 980,
+        "y": 300,
+        "wires": [
+            [
+                "9b49653206d07764"
+            ]
+        ]
+    },
+    {
+        "id": "a610e76559e70dc4",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "test false",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 980,
+        "y": 340,
+        "wires": [
+            [
+                "9b49653206d07764"
+            ]
+        ]
+    },
+    {
+        "id": "0af39417ab50b753",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Prepare message",
+        "func": "var valueBin = msg.payload;\nvar valueBinVector = [];\nvar zero = [0, 0, 0];\nvar sNumber = valueBin.toString();\nvar len = sNumber.length;\n\n/* split digits */\nfor (var i = 0; i < len; i++) {\n    valueBinVector.push(+sNumber.charAt(i));\n}\nvalueBinVector.reverse();\nvalueBinVector.length = 3;\n\n/* replace undefined digits with zeroes */\nfor (i = 0; i < 3; i++)\n{\n    if (valueBinVector[i] != null)\n    {\n        zero[i] = valueBinVector[i];\n    }\n}\nvalueBinVector = zero;\n\n/* Prepare message */\nvar boardAddress = flow.get(\"boardAddress\");\nvar relayNumber = 0;\n\nmsg.payload = { \n    value: valueBinVector,\n    'fc': 15, \n    'unitid': boardAddress, \n    'address': relayNumber, \n    'quantity': 3 }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 680,
+        "wires": [
+            [
+                "273f3a0ab19034c7"
+            ]
+        ]
+    },
+    {
+        "id": "273f3a0ab19034c7",
+        "type": "modbus-flex-write",
+        "z": "8053da30.9f5288",
+        "name": "modbus_write_allRelays",
+        "showStatusActivities": true,
+        "showErrors": true,
+        "server": "b04279f80c449024",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 1390,
+        "y": 680,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "db9d4f496b6a216b",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Return 0",
+        "func": "msg.payload = 0;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 740,
+        "wires": [
+            [
+                "e7b3ab2e7bb80348",
+                "75a143b1.68e99c"
+            ]
+        ]
+    },
+    {
+        "id": "c3a7442e8fe21cf5",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Dec to Bin",
+        "func": "var x = msg.payload;\nlet bin = 0;\nlet rem, i = 1;\nwhile (x != 0) {\n    rem = x % 2;\n    x = parseInt(x / 2);\n    bin = bin + rem * i;\n    i = i * 10;\n}\nmsg.payload = bin;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 680,
+        "wires": [
+            [
+                "0af39417ab50b753"
+            ]
+        ]
+    },
+    {
+        "id": "c1667bd693942ea6",
+        "type": "link out",
+        "z": "8053da30.9f5288",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "f13ada412a07e208",
+            "cd66873e9a1b4e45",
+            "c01df771a2299555"
+        ],
+        "x": 475,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "c53ae7fb70654a8d",
+        "type": "link out",
+        "z": "8053da30.9f5288",
+        "name": "link out 3",
+        "mode": "link",
+        "links": [
+            "f13ada412a07e208",
+            "cd66873e9a1b4e45"
+        ],
+        "x": 835,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "2dc14ca5c4c30a74",
+        "type": "link out",
+        "z": "8053da30.9f5288",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "f13ada412a07e208",
+            "cd66873e9a1b4e45"
+        ],
+        "x": 825,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "bcca2f58465ea552",
+        "type": "link out",
+        "z": "8053da30.9f5288",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "f13ada412a07e208",
+            "cd66873e9a1b4e45",
+            "64e7c1a23498bf7d"
+        ],
+        "x": 435,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "1b26c184ef0a021c",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Read all relays; Prepare message",
+        "func": "var boardAddress = flow.get(\"boardAddress\");\nvar relayValue = 0;\n\nmsg.payload = { \n    'fc': 1, \n    'unitid': boardAddress, \n    'address': relayValue, \n    'quantity': 3 }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 940,
+        "wires": [
+            [
+                "50de2631dd13c1c0"
+            ]
+        ]
+    },
+    {
+        "id": "50de2631dd13c1c0",
+        "type": "modbus-flex-getter",
+        "z": "8053da30.9f5288",
+        "name": "modbus_read_allRelays",
+        "showStatusActivities": true,
+        "showErrors": true,
+        "logIOActivities": false,
+        "server": "b04279f80c449024",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 910,
+        "y": 940,
+        "wires": [
+            [],
+            [
+                "018f743250a465b2"
+            ]
+        ]
+    },
+    {
+        "id": "938f8640c4c58fec",
+        "type": "inject",
+        "z": "8053da30.9f5288",
+        "name": "test",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 370,
+        "y": 1020,
+        "wires": [
+            [
+                "1b26c184ef0a021c"
+            ]
+        ]
+    },
+    {
+        "id": "018f743250a465b2",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Hex to Dec",
+        "func": "var relayState = msg.payload.buffer[0]\nparseInt(relayState);\nmsg.payload = relayState;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 940,
+        "wires": [
+            [
+                "af6a9361d907c813"
+            ]
+        ]
+    },
+    {
+        "id": "07d99511c0ae3d83",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Refresh readings",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 540,
+        "wires": [
+            [
+                "ba35cf5d8d911cce"
+            ]
+        ]
+    },
+    {
+        "id": "c01df771a2299555",
+        "type": "link in",
+        "z": "8053da30.9f5288",
+        "name": "link in 2",
+        "links": [
+            "c1667bd693942ea6"
+        ],
+        "x": 1155,
+        "y": 540,
+        "wires": [
+            [
+                "07d99511c0ae3d83"
+            ]
+        ]
+    },
+    {
+        "id": "27c76be76869a161",
+        "type": "delay",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1280,
+        "y": 480,
+        "wires": [
+            [
+                "ba35cf5d8d911cce"
+            ]
+        ]
+    },
+    {
+        "id": "2c8f71ae013b47ef",
+        "type": "function",
+        "z": "8053da30.9f5288",
+        "name": "Refresh readings",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1330,
+        "y": 1020,
+        "wires": [
+            [
+                "daf00a98a273c69b"
+            ]
+        ]
+    },
+    {
+        "id": "af6a9361d907c813",
+        "type": "delay",
+        "z": "8053da30.9f5288",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1320,
+        "y": 940,
+        "wires": [
+            [
+                "daf00a98a273c69b"
+            ]
+        ]
+    },
+    {
+        "id": "64e7c1a23498bf7d",
+        "type": "link in",
+        "z": "8053da30.9f5288",
+        "name": "link in 3",
+        "links": [
+            "bcca2f58465ea552"
+        ],
+        "x": 1175,
+        "y": 1020,
+        "wires": [
+            [
+                "2c8f71ae013b47ef"
+            ]
+        ]
+    },
+    {
+        "id": "96b947ff.55f348",
+        "type": "ui_group",
+        "name": "Test Modbus Relays",
+        "tab": "068445a64d772bd8",
+        "order": 1,
+        "disp": false,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b04279f80c449024",
+        "type": "modbus-client",
+        "name": "3relind-rpi",
+        "clienttype": "serial",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "127.0.0.1",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/serial0",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": "38400",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": "",
+        "commandDelay": "1",
+        "clientTimeout": "1000",
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": "2000",
+        "parallelUnitIdsAllowed": false
+    },
+    {
+        "id": "068445a64d772bd8",
+        "type": "ui_tab",
+        "name": "Sequent Microsystems - 3relind Usage Example",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
