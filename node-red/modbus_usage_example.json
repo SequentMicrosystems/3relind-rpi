@@ -58,7 +58,7 @@
         "topicType": "msg",
         "format": "{{value}}",
         "min": 0,
-        "max": "255",
+        "max": "7",
         "step": 1,
         "className": "",
         "x": 680,
@@ -1073,6 +1073,37 @@
                 "2c8f71ae013b47ef"
             ]
         ]
+    },
+    {
+        "id": "fe16dd0e98db7a0b",
+        "type": "ui_template",
+        "z": "8053da30.9f5288",
+        "group": "96b947ff.55f348",
+        "name": "Setup text",
+        "order": 13,
+        "width": 10,
+        "height": 6,
+        "format": "<div class=\\\"scroll-hide\\\">\n    <p>1) \"Set Board Address\": Choose here the Modbus Address of the board you want to control</p>\n    <p>2) \"Select Relay\": Dropdown menu to select the relay you want to control from the board</p>\n    <p>3) \"Toggle Selected Relay\": Turn on or off the selected relay</p>\n    <p>4) \"Read Selected Relay\": Press this button to read the current state of the selected relay</p>\n    <p>5) \"Set all relays\": Use the dropdown menu or the numeric input to set a value for all relays</p>\n    <p>6) \"Reset Values\": Press this button to reset the values to zero</p>\n    <p>7) \"Read All Relays\": Press this button to read the decimal value of all relays</p>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 200,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "892b060fb640352d",
+        "type": "ui_spacer",
+        "z": "8053da30.9f5288",
+        "name": "spacer",
+        "group": "96b947ff.55f348",
+        "order": 12,
+        "width": 10,
+        "height": 1
     },
     {
         "id": "96b947ff.55f348",

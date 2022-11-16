@@ -1,0 +1,1109 @@
+[
+    {
+        "id": "d3d5199d08d871f7",
+        "type": "tab",
+        "label": "I2C Usage Example",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b48d0f42f2df776e",
+        "type": "ui_dropdown",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "label": "Select Relay",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "f479df36737e0d74",
+        "order": 3,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "Relay 1",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "Relay 2",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "Relay 3",
+                "value": 3,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "336a1689fc695839"
+            ]
+        ]
+    },
+    {
+        "id": "8093a670825b6929",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 170,
+        "y": 240,
+        "wires": [
+            [
+                "b48d0f42f2df776e"
+            ]
+        ]
+    },
+    {
+        "id": "a8f3e584efc0773e",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "x": 170,
+        "y": 160,
+        "wires": [
+            [
+                "9d2871f5017a1525"
+            ]
+        ]
+    },
+    {
+        "id": "9d2871f5017a1525",
+        "type": "ui_numeric",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "label": "Set Board Address",
+        "tooltip": "",
+        "group": "f479df36737e0d74",
+        "order": 1,
+        "width": 5,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": "0",
+        "max": "7",
+        "step": 1,
+        "className": "",
+        "x": 370,
+        "y": 160,
+        "wires": [
+            [
+                "a2c456c37f7f3148"
+            ]
+        ]
+    },
+    {
+        "id": "a2c456c37f7f3148",
+        "type": "change",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "boardAddressI2C",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 590,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "336a1689fc695839",
+        "type": "change",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "relayNumberI2C",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "34a2e8d448c50da0",
+        "type": "ui_switch",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "label": "Toggle Selected Relay",
+        "tooltip": "",
+        "group": "f479df36737e0d74",
+        "order": 4,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "topic",
+        "topicType": "msg",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 980,
+        "y": 260,
+        "wires": [
+            [
+                "a68799b62eb5b4c7",
+                "206669035abb356f"
+            ]
+        ]
+    },
+    {
+        "id": "a68799b62eb5b4c7",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Change relay state; Prepare message",
+        "func": "var toggleValue = msg.payload;\nvar boardAddress = flow.get(\"boardAddressI2C\");\nvar relayNumber = flow.get(\"relayNumberI2C\");\n\nmsg.address = boardAddress;\nmsg.relay = relayNumber;\nmsg.payload = toggleValue;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 260,
+        "wires": [
+            [
+                "843f895ce65871d6"
+            ]
+        ]
+    },
+    {
+        "id": "f352fac64cfe5c63",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "test true",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 1020,
+        "y": 300,
+        "wires": [
+            [
+                "a68799b62eb5b4c7"
+            ]
+        ]
+    },
+    {
+        "id": "1ebdacdc896c5be5",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "test false",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "x": 1020,
+        "y": 340,
+        "wires": [
+            [
+                "a68799b62eb5b4c7"
+            ]
+        ]
+    },
+    {
+        "id": "843f895ce65871d6",
+        "type": "3relind",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "address": "",
+        "relay": "",
+        "payload": "payload",
+        "payloadType": "msg",
+        "x": 1510,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ebd79851e13d7c13",
+        "type": "ui_button",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "group": "f479df36737e0d74",
+        "order": 5,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Read Selected Relay",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 540,
+        "y": 500,
+        "wires": [
+            [
+                "d328fd2ad06c7401",
+                "251ad0f70c03a4cd"
+            ]
+        ]
+    },
+    {
+        "id": "d328fd2ad06c7401",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Read relay state; Prepare message",
+        "func": "var boardAddress = flow.get(\"boardAddressI2C\");\nvar relayNumber = flow.get(\"relayNumberI2C\");\n\nmsg.address = boardAddress;\nmsg.relay = relayNumber;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 500,
+        "wires": [
+            [
+                "5d94c21c994ee2ce"
+            ]
+        ]
+    },
+    {
+        "id": "982e29a6362fda44",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "test",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 590,
+        "y": 440,
+        "wires": [
+            [
+                "d328fd2ad06c7401"
+            ]
+        ]
+    },
+    {
+        "id": "5d94c21c994ee2ce",
+        "type": "3relindrd",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "address": "",
+        "relay": "",
+        "payload": "payload",
+        "payloadType": "msg",
+        "x": 1080,
+        "y": 500,
+        "wires": [
+            [
+                "bd90ef172ec6ab44",
+                "854125238046a86d"
+            ]
+        ]
+    },
+    {
+        "id": "cd2ec3a383e34e8e",
+        "type": "ui_numeric",
+        "z": "d3d5199d08d871f7",
+        "name": "Set all relays (numeric)",
+        "label": "",
+        "tooltip": "",
+        "group": "f479df36737e0d74",
+        "order": 8,
+        "width": 2,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "topic",
+        "topicType": "msg",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "7",
+        "step": 1,
+        "className": "",
+        "x": 880,
+        "y": 760,
+        "wires": [
+            [
+                "ecdb37b6b04e8199",
+                "e06036a688cd3b29"
+            ]
+        ]
+    },
+    {
+        "id": "55e8681911413d72",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "0",
+        "payloadType": "num",
+        "x": 650,
+        "y": 700,
+        "wires": [
+            [
+                "9420dec5aa266ef2",
+                "cd2ec3a383e34e8e"
+            ]
+        ]
+    },
+    {
+        "id": "7ce61f26f92b41da",
+        "type": "ui_button",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "group": "f479df36737e0d74",
+        "order": 9,
+        "width": 3,
+        "height": 1,
+        "passthru": false,
+        "label": "Reset values",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 490,
+        "y": 760,
+        "wires": [
+            [
+                "0dd5ed8e63c3701f"
+            ]
+        ]
+    },
+    {
+        "id": "9420dec5aa266ef2",
+        "type": "ui_dropdown",
+        "z": "d3d5199d08d871f7",
+        "name": "Set all relays (dropdown)",
+        "label": "Set all relays",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "f479df36737e0d74",
+        "order": 7,
+        "width": 5,
+        "height": 1,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "0",
+                "value": 0,
+                "type": "num"
+            },
+            {
+                "label": "1",
+                "value": 1,
+                "type": "num"
+            },
+            {
+                "label": "2",
+                "value": 2,
+                "type": "num"
+            },
+            {
+                "label": "3",
+                "value": 3,
+                "type": "num"
+            },
+            {
+                "label": "4",
+                "value": 4,
+                "type": "num"
+            },
+            {
+                "label": "5",
+                "value": 5,
+                "type": "num"
+            },
+            {
+                "label": "6",
+                "value": 6,
+                "type": "num"
+            },
+            {
+                "label": "7",
+                "value": 7,
+                "type": "num"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 890,
+        "y": 700,
+        "wires": [
+            [
+                "ecdb37b6b04e8199",
+                "1334fbcafb1051ac"
+            ]
+        ]
+    },
+    {
+        "id": "0dd5ed8e63c3701f",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Return 0",
+        "func": "msg.payload = 0;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 760,
+        "wires": [
+            [
+                "9420dec5aa266ef2",
+                "cd2ec3a383e34e8e"
+            ]
+        ]
+    },
+    {
+        "id": "ecdb37b6b04e8199",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Prepare message",
+        "func": "var relayValue = msg.payload;\nvar boardAddress = flow.get(\"boardAddressI2C\");\n\nmsg.address = boardAddress;\nmsg.relay = 0;\nmsg.payload = relayValue;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1130,
+        "y": 740,
+        "wires": [
+            [
+                "931d22616f926814"
+            ]
+        ]
+    },
+    {
+        "id": "931d22616f926814",
+        "type": "3relind",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "address": "",
+        "relay": "",
+        "payload": "payload",
+        "payloadType": "msg",
+        "x": 1330,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "022372f9d9a7e767",
+        "type": "ui_text",
+        "z": "d3d5199d08d871f7",
+        "group": "f479df36737e0d74",
+        "order": 2,
+        "width": 5,
+        "height": 1,
+        "name": "Connection error",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 1630,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "6ec313777cebdd73",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Print error message",
+        "func": "var errorMessage = msg.error;\n\nif (errorMessage != null)\n{\n    msg.payload = \"Connection error!\";\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1230,
+        "y": 140,
+        "wires": [
+            [
+                "9253333be925db9a"
+            ]
+        ]
+    },
+    {
+        "id": "5fe99f615d45353e",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Delete error message",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 80,
+        "wires": [
+            [
+                "022372f9d9a7e767"
+            ]
+        ]
+    },
+    {
+        "id": "abaa66c1f5b49c6e",
+        "type": "catch",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "scope": [
+            "843f895ce65871d6",
+            "5d94c21c994ee2ce",
+            "931d22616f926814",
+            "0d7d73321247d0fb"
+        ],
+        "uncaught": false,
+        "x": 1030,
+        "y": 140,
+        "wires": [
+            [
+                "6ec313777cebdd73"
+            ]
+        ]
+    },
+    {
+        "id": "b064464372774eab",
+        "type": "ui_button",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "group": "f479df36737e0d74",
+        "order": 10,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Read all relays",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 480,
+        "y": 960,
+        "wires": [
+            [
+                "7c548b665c245813",
+                "8fe44845fd57833b"
+            ]
+        ]
+    },
+    {
+        "id": "7c548b665c245813",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Read all relays; Prepare message",
+        "func": "var boardAddress = flow.get(\"boardAddressI2C\");\n\nmsg.address = boardAddress;\nmsg.relay = 0;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 960,
+        "wires": [
+            [
+                "0d7d73321247d0fb"
+            ]
+        ]
+    },
+    {
+        "id": "5c6fbeffb7a1e374",
+        "type": "inject",
+        "z": "d3d5199d08d871f7",
+        "name": "test",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 530,
+        "y": 1040,
+        "wires": [
+            [
+                "7c548b665c245813"
+            ]
+        ]
+    },
+    {
+        "id": "0d7d73321247d0fb",
+        "type": "3relindrd",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "address": "",
+        "relay": "",
+        "payload": "payload",
+        "payloadType": "msg",
+        "x": 1020,
+        "y": 960,
+        "wires": [
+            [
+                "87b467cd131dd933",
+                "8da70cf0cf7842a6"
+            ]
+        ]
+    },
+    {
+        "id": "206669035abb356f",
+        "type": "link out",
+        "z": "d3d5199d08d871f7",
+        "name": "link out 6",
+        "mode": "link",
+        "links": [
+            "5a018ce32ce630d8"
+        ],
+        "x": 1115,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "5a018ce32ce630d8",
+        "type": "link in",
+        "z": "d3d5199d08d871f7",
+        "name": "link in 4",
+        "links": [
+            "251ad0f70c03a4cd",
+            "206669035abb356f",
+            "1334fbcafb1051ac",
+            "e06036a688cd3b29",
+            "8fe44845fd57833b"
+        ],
+        "x": 1055,
+        "y": 80,
+        "wires": [
+            [
+                "5fe99f615d45353e"
+            ]
+        ]
+    },
+    {
+        "id": "251ad0f70c03a4cd",
+        "type": "link out",
+        "z": "d3d5199d08d871f7",
+        "name": "link out 7",
+        "mode": "link",
+        "links": [
+            "5a018ce32ce630d8",
+            "0afb38ec181b7c15"
+        ],
+        "x": 715,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "1334fbcafb1051ac",
+        "type": "link out",
+        "z": "d3d5199d08d871f7",
+        "name": "link out 8",
+        "mode": "link",
+        "links": [
+            "5a018ce32ce630d8"
+        ],
+        "x": 1045,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "e06036a688cd3b29",
+        "type": "link out",
+        "z": "d3d5199d08d871f7",
+        "name": "link out 9",
+        "mode": "link",
+        "links": [
+            "5a018ce32ce630d8"
+        ],
+        "x": 1035,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "8fe44845fd57833b",
+        "type": "link out",
+        "z": "d3d5199d08d871f7",
+        "name": "link out 10",
+        "mode": "link",
+        "links": [
+            "5a018ce32ce630d8",
+            "757285c8c2cb95f9"
+        ],
+        "x": 615,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "1ba1f6eb19dec7e6",
+        "type": "ui_text",
+        "z": "d3d5199d08d871f7",
+        "group": "f479df36737e0d74",
+        "order": 6,
+        "width": 5,
+        "height": 1,
+        "name": "Display state of selected relay",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 1510,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "e486ca5ffe3f0dad",
+        "type": "ui_text",
+        "z": "d3d5199d08d871f7",
+        "group": "f479df36737e0d74",
+        "order": 11,
+        "width": 5,
+        "height": 1,
+        "name": "Display value of all relays",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 1410,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "bd90ef172ec6ab44",
+        "type": "debug",
+        "z": "d3d5199d08d871f7",
+        "name": "debug 26",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "87b467cd131dd933",
+        "type": "debug",
+        "z": "d3d5199d08d871f7",
+        "name": "debug 27",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1160,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "bc9808f87d153238",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Refresh readings",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1230,
+        "y": 560,
+        "wires": [
+            [
+                "1ba1f6eb19dec7e6"
+            ]
+        ]
+    },
+    {
+        "id": "0afb38ec181b7c15",
+        "type": "link in",
+        "z": "d3d5199d08d871f7",
+        "name": "link in 5",
+        "links": [
+            "251ad0f70c03a4cd"
+        ],
+        "x": 1105,
+        "y": 560,
+        "wires": [
+            [
+                "bc9808f87d153238"
+            ]
+        ]
+    },
+    {
+        "id": "854125238046a86d",
+        "type": "delay",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1260,
+        "y": 500,
+        "wires": [
+            [
+                "1ba1f6eb19dec7e6"
+            ]
+        ]
+    },
+    {
+        "id": "8da70cf0cf7842a6",
+        "type": "delay",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1200,
+        "y": 960,
+        "wires": [
+            [
+                "e486ca5ffe3f0dad"
+            ]
+        ]
+    },
+    {
+        "id": "9253333be925db9a",
+        "type": "delay",
+        "z": "d3d5199d08d871f7",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1420,
+        "y": 140,
+        "wires": [
+            [
+                "022372f9d9a7e767"
+            ]
+        ]
+    },
+    {
+        "id": "e19f46312053838c",
+        "type": "ui_template",
+        "z": "d3d5199d08d871f7",
+        "group": "f479df36737e0d74",
+        "name": "Setup text",
+        "order": 13,
+        "width": 10,
+        "height": 6,
+        "format": "<div class=\\\"scroll-hide\\\">\n    <p>1) \"Set Board Address\": Choose here the I2C Address of the board you want to control</p>\n    <p>2) \"Select Relay\": Dropdown menu to select the relay you want to control from the board</p>\n    <p>3) \"Toggle Selected Relay\": Turn on or off the selected relay</p>\n    <p>4) \"Read Selected Relay\": Press this button to read the current state of the selected relay</p>\n    <p>5) \"Set all relays\": Use the dropdown menu or the numeric input to set a value for all relays</p>\n    <p>6) \"Reset Values\": Press this button to reset the values to zero</p>\n    <p>7) \"Read All Relays\": Press this button to read the decimal value of all relays</p>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 220,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "757285c8c2cb95f9",
+        "type": "link in",
+        "z": "d3d5199d08d871f7",
+        "name": "link in 6",
+        "links": [
+            "8fe44845fd57833b"
+        ],
+        "x": 1015,
+        "y": 1040,
+        "wires": [
+            [
+                "ce1b07e85093e5ea"
+            ]
+        ]
+    },
+    {
+        "id": "ce1b07e85093e5ea",
+        "type": "function",
+        "z": "d3d5199d08d871f7",
+        "name": "Refresh readings",
+        "func": "msg.payload = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1140,
+        "y": 1040,
+        "wires": [
+            [
+                "e486ca5ffe3f0dad"
+            ]
+        ]
+    },
+    {
+        "id": "a8084c7110739c21",
+        "type": "ui_spacer",
+        "z": "d3d5199d08d871f7",
+        "name": "spacer",
+        "group": "f479df36737e0d74",
+        "order": 12,
+        "width": 10,
+        "height": 1
+    },
+    {
+        "id": "f479df36737e0d74",
+        "type": "ui_group",
+        "name": "Test I2C Relays",
+        "tab": "b4fe65095a32a3fa",
+        "order": 1,
+        "disp": false,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b4fe65095a32a3fa",
+        "type": "ui_tab",
+        "name": "Sequent Microsystems - 3relind I2C Example",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
