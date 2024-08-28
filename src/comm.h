@@ -6,7 +6,7 @@
 #include "modbus.h"
 #include "relay.h"
 
-#define MODBUS_UART_PORT            "/dev/serial0"
+#define MODBUS_UART_PORT            "/dev/ttyAMA0"
 #define MODBUS_DEFAULT_BAUD         38400
 #define MODBUS_DEFAULT_PARITY       'N'
 #define MODBUS_DEFAULT_STOPBITS     1

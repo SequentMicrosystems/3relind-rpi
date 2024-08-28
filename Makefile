@@ -35,7 +35,7 @@ install: 3relind
 	$Q echo "[Install]"
 	$Q cp 3relind		$(DESTDIR)$(PREFIX)/bin
 ifneq ($(WIRINGPI_SUID),0)
-	$Q chown root.root	$(DESTDIR)$(PREFIX)/bin/3relind
+	$Q chown root:root	$(DESTDIR)$(PREFIX)/bin/3relind
 	$Q chmod 4755		$(DESTDIR)$(PREFIX)/bin/3relind
 endif
 #	$Q mkdir -p		$(DESTDIR)$(PREFIX)/man/man1
